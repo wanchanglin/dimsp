@@ -1,4 +1,4 @@
-# massPix for Galaxy #
+# dimsp for Galaxy #
 
 This is Galaxy tool for R tools `dims_processing` for data processing of
 direct-infusion mass spectrometry-based lipidomics data.
@@ -10,14 +10,12 @@ For details, see [dims_processing](https://github.com/hallz/dims_processing).
 You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
 [R](https://cran.r-project.org/) under Linux. 
 
-- Install four R packages `optparse`, `WriteXLS`, `calibrate` and `rJava`
+- Install four R packages `optparse`, `WriteXLS`, `xcms` and `data.table`
   inside R. 
-- Do not install R package `massPix`. This tool embeds a modified `massPix`
-  package for Galaxy only.
 - Use `git` to clone this tool
 
   ```bash
-  git clone https://github.com/wanchanglin/massPix.git
+  git clone https://github.com/wanchanglin/dimsp.git
   ```
 
 - Add this tool's location into Galaxy' tool config file:
@@ -33,15 +31,16 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
     </section>
     
     <section id="MyTools" name="My Tools">
-      <tool file="/path/to/massPix/massPix.xml" />
+      <tool file="/path/to/dimsp/dimsp.xml" />
     </section>
 
   </toolbox>
   ```
 
-- Download test data (.ibd and .imzML files) from the
-  [MetaboLights](https://www.ebi.ac.uk/metabolights/) repository accession
-  number [MTBLS487](https://www.ebi.ac.uk/metabolights/MTBLS487). 
+- Test data:
+  - positive and negative DIMS files in mzXML are located in `test-data`.
+  - Lipid lists in TSV(Tab Separated Values) format are in directory 
+    `LipidList_generator`. 
 
 ## To-Do ##
 
