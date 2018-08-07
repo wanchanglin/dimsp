@@ -1,15 +1,15 @@
 ## wl-10-07-2018, Tue: commence
 ## wl-13-07-2018, Fri: make script working
 ## wl-17-07-2018, Tue: check xcmsRaw and getSpec
-## wl-06-08-2018, Mon: 
-##  1.) unify positive and negative
-##  2.) how to deal with multiple files? use zip or individual?
+## wl-06-08-2018, Mon: 1.) unify positive and negative 2.) Use multiple
+## files, not file directory
+## wl-07-08-2018, Tue: finish the first working version for Galaxy
 ## ======================================================================
 
 rm(list=ls(all=T))
 
 ## flag for command-line use or not. If false, only for debug interactively.
-com_f  <- F
+com_f  <- T
 
 ## ------------------------------------------------------------------------
 ## galaxy will stop even if R has warning message
@@ -64,12 +64,18 @@ if(com_f){
                     help="Lipid target list with columns of m/z and lipid name"),
 
         ## output files (Excel)
-        make_option("--indi_file",type="character", default="sam_indi.xlsx",
-                    help="Save sample individual result in Excel"),
         make_option("--sign_file",type="character", default="signals.tsv",
                     help="Save peak signals (peak table)"),
+
+        make_option("--devi", type="logical", default=TRUE,
+                    help="Return m/z deviation results or not"),
         make_option("--devi_file",type="character", default="deviations.tsv",
-                    help="Save peak deviations")
+                    help="Save m/z deviations"),
+
+        make_option("--indi", type="logical", default=TRUE,
+                    help="Return each sample's signal and m/z deviation or not"),
+        make_option("--indi_file",type="character", default="sam_indi.xlsx",
+                    help="Save individual sample's signal and m/z deviation in Excel")
     )
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
@@ -77,8 +83,8 @@ if(com_f){
   ## print(opt)
 
 } else {
-  tool_dir <- "C:/R_lwc/dims_processing/"         ## for windows
-  ## tool_dir <- "~/my_galaxy/isolab/"  ## for linux. must be case-sensitive
+  tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
+  ## tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. must be case-sensitive
   opt  <- list(
       ## input files
       mzxml_file = paste(paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
@@ -89,10 +95,12 @@ if(com_f){
 
       targ_file  = paste0(tool_dir,"LipidList_generator/Positive_LipidList.tsv"),
 
-      ## Excel files
-      indi_file = paste0(tool_dir,"res/sam_indi.xlsx"),
+      ## Output
       sign_file = paste0(tool_dir,"res/signals.tsv"),
-      devi_file = paste0(tool_dir,"res/deviations.tsv")
+      devi      = TRUE,
+      devi_file = paste0(tool_dir,"res/deviations.tsv"),
+      indi      = TRUE,
+      indi_file = paste0(tool_dir,"res/individuals.xlsx")
   )
 
 }
@@ -107,44 +115,48 @@ tmp            <- unlist(strsplit(tmp,","))
 tmp            <- gsub("^[ \t]+|[ \t]+$", "", tmp)  ## trim white spaces
 opt$mzxml_file <- tmp
 
-## file path of mzML files
-## path  <- "C:/R_lwc/dims_processing/test-data/DIMS_pos"
-## files <- list.files(path, pattern="mzXML",recursive = F, full.names = TRUE)
-files <- opt$mzxml_file
-
-## targets <- read.table("./Positive_LipidList.csv", header=T, sep=',', stringsAsFactors = F)
 targets <- read.table(opt$targ_file, header=T, sep='\t', stringsAsFactors = F)
 targets <- data.table(targets)
 
 ## ------------------------------------------------------------ 
-res  <- lapply(files, function(x){  ## x = files[[1]]
-                 spec <- getspectra(filename=x, rt=c(20,60), mz=c(200,1200))
-                 tgts <- peaktable(targets,spec)
-                 return(tgts)
-})
-## extract only sample names (use greedy match)
-names(res) <- gsub(".*/|\\..*$","",files,perl=T)
-## save(res,file="./res/res.RData")
+## temporary debug in interactive mode
+if (T){
+  res  <- lapply(opt$mzxml_file, function(x){  ## x = files[[1]]
+                   spec <- getspectra(filename=x, rt=c(20,60), mz=c(200,1200))
+                   tgts <- peaktable(targets,spec)
+                   return(tgts)
+                 })
+  ## extract only sample names (use greedy match)
+  names(res) <- gsub(".*/|\\..*$","",opt$mzxml_file,perl=T)
+  ## save(res,file=paste0(tool_dir,"res/res.RData"))
+} else {
+  ## load(paste0(tool_dir,"res/res.RData"))
+}
+
 ## lapply(res, dim)
 
 ## --------------------------------------------------------------------  
-## save single result
-WriteXLS(res, ExcelFileName = opt$indi_file,row.names = F, 
-         FreezeRow = 1)
-
+## Output results
 ## --------------------------------------------------------------------  
-## get signals (intensity) and mz deciations
+## get signals (intensity) and mz deviations
 tmp        <- targets[,c("name","mz")]
 signals    <- sapply(res,function(x) return(x[,"signal"]))
 deviations <- sapply(res,function(x) return(x[,"mz_deviation"]))
 signals    <- cbind(tmp,signals)
 deviations <- cbind(tmp,deviations)
-## save results
+## save peak table
 write.table(signals, file=opt$sign_file, sep="\t",row.names=F)
-write.table(deviations, file=opt$devi_file,sep="\t",row.names=F)
+## save m/z deviations
+if (opt$devi){
+  write.table(deviations, file=opt$devi_file,sep="\t",row.names=F)
+}
+## save each sample result
+if (opt$indi){
+  WriteXLS(res, ExcelFileName = opt$indi_file, row.names = F, FreezeRow = 1)
+}
 
 ######################################################################
-## Original R codes
+## Interactive mode R codes
 ######################################################################
 if (F){
   source("all_dimsp.R") 
