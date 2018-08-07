@@ -1,0 +1,16 @@
+## Folders to be ignored
+doc/
+res/
+
+## R History and session data files
+.RData
+.Rhistory
+.Rapp.history
+
+## Others
+.DS_Store
+*.swp
+*.*~
+#*#
+.#*
+
