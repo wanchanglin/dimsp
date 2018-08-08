@@ -1,0 +1,96 @@
+<!--
+    wl-08-08-2018, Wed: commence
+-->
+
+<tool id="dimsp" name="dims_processing" version="0.1.0">
+  <description>
+    Direct-infusion mass spectrometrylipidomics processing
+  </description>
+  
+  <!-- =============================================================== -->
+  <command>
+    <![CDATA[
+        #for $file in $mzxml_file
+          [ -f "$file" ] && mv "$file" "${file%.dat}.mzXML" 
+          ## mv "$f" "$(basename "$f" .dat).mzXML"
+        #end for
+    
+      Rscript ${__tool_directory__}/dimsp.R
+        ## input files
+        --mzxml_file $mzxml_file 
+        --targ_file $targ_file 
+        
+        ## output files
+        --sign_file $sign_file 
+        #if $devi:
+          --devi_file $devi_file 
+        #end if
+        #if $indi:
+          --indi_file $indi_file 
+        #end if
+
+    ]]>
+  </command>
+
+  <!-- =============================================================== -->
+  <inputs>
+    <param name="mzxml_file" type="data"  format="mzxml" multiple="true" 
+           label="dims data" optional="true"
+           help="A bunch of dims data (positive or negative mode) in mzXML 
+                 format." />
+
+    <param name="targ_file" type="data"  format="tabular" 
+           label="Targets matrix" 
+           help="A data matrix containing lipid target lists (positive or 
+                 negative). " />
+
+    <param name="devi" type="boolean" truevalue="True" falsevalue="False" 
+           checked="true" label="Produce m/z deviations table?" 
+           help="A single table with m/z devisations based on lipd target list" /> 
+
+    <param name="indi" type="boolean" truevalue="True" falsevalue="False" 
+           checked="true" 
+           label="Produce signal and deviation for each individual sample?"
+           help="A XLSX file containing sheets of individual sample's signals
+                 and deviations." />
+
+  </inputs>
+
+
+  <!-- =============================================================== -->
+  <outputs>
+    <data format="tabular" name="sign_file" 
+          label="Peak signals on ${on_string}"/>
+  
+    <data format="tabular" name="devi_file" 
+        label="m/z deviations file on ${on_string}">
+      <filter> devi == True </filter>
+    </data>
+
+    <data format="xlsx" name="indi_file" 
+        label="Individual sample's signal and m/z deviation on ${on_string}">
+      <filter> indi == True </filter>
+    </data>
+    
+  </outputs>
+
+  <!-- =============================================================== -->
+  <tests>
+    <test>
+      <param name="mzxml_file" value="tmp.mzXML" />
+      <param name="targ_file" value="targets.tsv" />
+      <param name="devi" value="TRUE" /> 
+      <param name="indi" value="TRUE" /> 
+      <output name="sign_file" file="sign_file.tsv" />
+      <output name="devi_file" file="devi_file.tsv" />
+      <output name="indi_file" file="indi_file.xlsx" />
+    </test>
+  </tests>
+
+
+  <!-- =============================================================== -->
+  <help>
+    This is a basic Galaxy wrapper for dims-processing. 
+  </help>
+
+</tool>

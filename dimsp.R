@@ -83,8 +83,8 @@ if(com_f){
   ## print(opt)
 
 } else {
-  tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
-  ## tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. must be case-sensitive
+  ## tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
+  tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. must be case-sensitive
   opt  <- list(
       ## input files
       mzxml_file = paste(paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
@@ -114,6 +114,7 @@ tmp            <- opt$mzxml_file
 tmp            <- unlist(strsplit(tmp,","))
 tmp            <- gsub("^[ \t]+|[ \t]+$", "", tmp)  ## trim white spaces
 opt$mzxml_file <- tmp
+opt$mzxml_file
 
 targets <- read.table(opt$targ_file, header=T, sep='\t', stringsAsFactors = F)
 targets <- data.table(targets)
