@@ -10,24 +10,22 @@
   <!-- =============================================================== -->
   <command>
     <![CDATA[
-        #for $file in $mzxml_file
-          [ -f "$file" ] && mv "$file" "${file%.dat}.mzXML" 
-          ## mv "$f" "$(basename "$f" .dat).mzXML"
+        #for $file in $mzxml_file:
+	      ln -f -s ${file} ${file}.mzXML &&
         #end for
     
       Rscript ${__tool_directory__}/dimsp.R
         ## input files
         --mzxml_file $mzxml_file 
         --targ_file $targ_file 
-        
         ## output files
         --sign_file $sign_file 
         #if $devi:
-          --devi_file $devi_file 
+           --devi_file $devi_file 
         #end if
         #if $indi:
           --indi_file $indi_file 
-        #end if
+        #end  if
 
     ]]>
   </command>
@@ -45,11 +43,11 @@
                  negative). " />
 
     <param name="devi" type="boolean" truevalue="True" falsevalue="False" 
-           checked="true" label="Produce m/z deviations table?" 
+           checked="True" label="Produce m/z deviations table?" 
            help="A single table with m/z devisations based on lipd target list" /> 
 
     <param name="indi" type="boolean" truevalue="True" falsevalue="False" 
-           checked="true" 
+           checked="True" 
            label="Produce signal and deviation for each individual sample?"
            help="A XLSX file containing sheets of individual sample's signals
                  and deviations." />
@@ -59,14 +57,13 @@
 
   <!-- =============================================================== -->
   <outputs>
-    <data format="tabular" name="sign_file" 
+    <!-- <data format="tabular" name="sign_file" --> 
+    <data format="xlsx" name="sign_file" 
           label="Peak signals on ${on_string}"/>
-  
-    <data format="tabular" name="devi_file" 
+    <data format="xlsx" name="devi_file" 
         label="m/z deviations file on ${on_string}">
       <filter> devi == True </filter>
     </data>
-
     <data format="xlsx" name="indi_file" 
         label="Individual sample's signal and m/z deviation on ${on_string}">
       <filter> indi == True </filter>

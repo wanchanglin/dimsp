@@ -114,7 +114,8 @@ tmp            <- opt$mzxml_file
 tmp            <- unlist(strsplit(tmp,","))
 tmp            <- gsub("^[ \t]+|[ \t]+$", "", tmp)  ## trim white spaces
 opt$mzxml_file <- tmp
-opt$mzxml_file
+opt$mzxml_file <- paste0(opt$mzxml_file,".mzXML")
+
 
 targets <- read.table(opt$targ_file, header=T, sep='\t', stringsAsFactors = F)
 targets <- data.table(targets)
@@ -134,6 +135,8 @@ if (T){
   ## load(paste0(tool_dir,"res/res.RData"))
 }
 
+## names(res)
+## opt$mzxml_file
 ## lapply(res, dim)
 
 ## --------------------------------------------------------------------  
@@ -145,16 +148,21 @@ signals    <- sapply(res,function(x) return(x[,"signal"]))
 deviations <- sapply(res,function(x) return(x[,"mz_deviation"]))
 signals    <- cbind(tmp,signals)
 deviations <- cbind(tmp,deviations)
+
 ## save peak table
-write.table(signals, file=opt$sign_file, sep="\t",row.names=F)
+## write.table(signals, file=opt$sign_file, sep=",",row.names=F)
+WriteXLS(as.data.frame(signals), ExcelFileName = opt$sign_file, row.names = F, FreezeRow = 1)
 ## save m/z deviations
 if (opt$devi){
-  write.table(deviations, file=opt$devi_file,sep="\t",row.names=F)
+  ## write.table(deviations, file=opt$devi_file,sep=",",row.names=F)
+  WriteXLS(as.data.frame(deviations), ExcelFileName = opt$devi_file, row.names = F, FreezeRow = 1)
 }
-## save each sample result
+## ## save each sample result
 if (opt$indi){
   WriteXLS(res, ExcelFileName = opt$indi_file, row.names = F, FreezeRow = 1)
 }
+## cat("\ngoes here\n")
+## lapply(res, dim)
 
 ######################################################################
 ## Interactive mode R codes
