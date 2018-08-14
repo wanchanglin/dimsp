@@ -4,6 +4,8 @@
 ## wl-06-08-2018, Mon: 1.) unify positive and negative 2.) Use multiple
 ## files, not file directory
 ## wl-07-08-2018, Tue: finish the first working version for Galaxy
+## wl-12-08-2018, Mon: Modify and debug
+## wl-14-08-2018, Tue: the second working version for galaxy. 
 ## ======================================================================
 
 rm(list=ls(all=T))
@@ -89,8 +91,6 @@ if(com_f){
       ## input files
       mzxml_file = paste(paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
                          paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
-                         paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_003.mzXML"),
-                         paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_004.mzXML"),
                          sep=","),
 
       targ_file  = paste0(tool_dir,"LipidList_generator/Positive_LipidList.tsv"),
@@ -114,8 +114,9 @@ tmp            <- opt$mzxml_file
 tmp            <- unlist(strsplit(tmp,","))
 tmp            <- gsub("^[ \t]+|[ \t]+$", "", tmp)  ## trim white spaces
 opt$mzxml_file <- tmp
-opt$mzxml_file <- paste0(opt$mzxml_file,".mzXML")
-
+if (!all(grepl("\\.mzXML",opt$mzxml_file))) {  ## for Galaxy only
+  opt$mzxml_file <- paste0(opt$mzxml_file,".mzXML")
+}
 
 targets <- read.table(opt$targ_file, header=T, sep='\t', stringsAsFactors = F)
 targets <- data.table(targets)
@@ -130,14 +131,14 @@ if (T){
                  })
   ## extract only sample names (use greedy match)
   names(res) <- gsub(".*/|\\..*$","",opt$mzxml_file,perl=T)
+  ## wl-14-08-2018, Tue: Beware that Galaxy changes the original data
+  ## filename. Currently no idea how to get the original filename back into
+  ## R script.
+
   ## save(res,file=paste0(tool_dir,"res/res.RData"))
 } else {
   ## load(paste0(tool_dir,"res/res.RData"))
 }
-
-## names(res)
-## opt$mzxml_file
-## lapply(res, dim)
 
 ## --------------------------------------------------------------------  
 ## Output results
@@ -146,20 +147,18 @@ if (T){
 tmp        <- targets[,c("name","mz")]
 signals    <- sapply(res,function(x) return(x[,"signal"]))
 deviations <- sapply(res,function(x) return(x[,"mz_deviation"]))
-signals    <- cbind(tmp,signals)
-deviations <- cbind(tmp,deviations)
+signals    <- as.data.frame(cbind(tmp,signals))
+deviations <- as.data.frame(cbind(tmp,deviations))
 
 ## save peak table
-## write.table(signals, file=opt$sign_file, sep=",",row.names=F)
-WriteXLS(as.data.frame(signals), ExcelFileName = opt$sign_file, row.names = F, FreezeRow = 1)
+write.table(signals, file=opt$sign_file, sep="\t",row.names=F)
 ## save m/z deviations
 if (opt$devi){
-  ## write.table(deviations, file=opt$devi_file,sep=",",row.names=F)
-  WriteXLS(as.data.frame(deviations), ExcelFileName = opt$devi_file, row.names = F, FreezeRow = 1)
+  write.table(deviations, file=opt$devi_file,sep="\t",row.names=F)
 }
 ## ## save each sample result
 if (opt$indi){
-  WriteXLS(res, ExcelFileName = opt$indi_file, row.names = F, FreezeRow = 1)
+  WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
 }
 ## cat("\ngoes here\n")
 ## lapply(res, dim)

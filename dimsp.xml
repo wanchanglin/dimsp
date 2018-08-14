@@ -1,6 +1,10 @@
 <!--
-    wl-08-08-2018, Wed: commence
--->
+wl-08-08-2018, Wed: commence
+wl-14-08-2018, Tue: Galaxy will change filename of uploaded data. But how 
+to extract the orignal filename info and pass into app for the column names 
+of results?
+--> 
+ 
 
 <tool id="dimsp" name="dims_processing" version="0.1.0">
   <description>
@@ -25,7 +29,7 @@
         #end if
         #if $indi:
           --indi_file $indi_file 
-        #end  if
+        #end if
 
     ]]>
   </command>
@@ -33,34 +37,29 @@
   <!-- =============================================================== -->
   <inputs>
     <param name="mzxml_file" type="data"  format="mzxml" multiple="true" 
-           label="dims data" optional="true"
+           label="dims data" optional="false"
            help="A bunch of dims data (positive or negative mode) in mzXML 
                  format." />
-
     <param name="targ_file" type="data"  format="tabular" 
            label="Targets matrix" 
            help="A data matrix containing lipid target lists (positive or 
                  negative). " />
-
     <param name="devi" type="boolean" truevalue="True" falsevalue="False" 
            checked="True" label="Produce m/z deviations table?" 
-           help="A single table with m/z devisations based on lipd target list" /> 
-
+           help="A single table with m/z devisations based on lipid target list" /> 
     <param name="indi" type="boolean" truevalue="True" falsevalue="False" 
            checked="True" 
            label="Produce signal and deviation for each individual sample?"
            help="A XLSX file containing sheets of individual sample's signals
-                 and deviations." />
-
+                 and m/z deviations." />
   </inputs>
 
 
   <!-- =============================================================== -->
   <outputs>
-    <!-- <data format="tabular" name="sign_file" --> 
-    <data format="xlsx" name="sign_file" 
+    <data format="tabular" name="sign_file" 
           label="Peak signals on ${on_string}"/>
-    <data format="xlsx" name="devi_file" 
+    <data format="tabular" name="devi_file" 
         label="m/z deviations file on ${on_string}">
       <filter> devi == True </filter>
     </data>
@@ -68,14 +67,13 @@
         label="Individual sample's signal and m/z deviation on ${on_string}">
       <filter> indi == True </filter>
     </data>
-    
   </outputs>
 
   <!-- =============================================================== -->
   <tests>
     <test>
-      <param name="mzxml_file" value="tmp.mzXML" />
-      <param name="targ_file" value="targets.tsv" />
+      <param name="mzxml_file" value="test.mzXML" />
+      <param name="targ_file" value="targ.tsv" />
       <param name="devi" value="TRUE" /> 
       <param name="indi" value="TRUE" /> 
       <output name="sign_file" file="sign_file.tsv" />
