@@ -125,7 +125,7 @@ targets <- data.table(targets)
 ## temporary debug in interactive mode
 if (T){
   res  <- lapply(opt$mzxml_file, function(x){  ## x = files[[1]]
-                   spec <- getspectra(filename=x, rt=c(20,60), mz=c(200,1200))
+                   spec <- suppressMessages(getspectra(filename=x, rt=c(20,60), mz=c(200,1200)))
                    tgts <- peaktable(targets,spec)
                    return(tgts)
                  })
