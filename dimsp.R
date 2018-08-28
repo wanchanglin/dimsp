@@ -6,6 +6,7 @@
 ## wl-07-08-2018, Tue: finish the first working version for Galaxy
 ## wl-12-08-2018, Mon: Modify and debug
 ## wl-14-08-2018, Tue: the second working version for galaxy. 
+## wl-28-08-2018, Tue: add 'samp_name' especially for galaxy.
 ## ======================================================================
 
 rm(list=ls(all=T))
@@ -33,6 +34,12 @@ suppressPackageStartupMessages({
   library(xcms)
   library(data.table)
 })
+
+## wl-28-08-2018, Tue: Convert a string seperated by comma into character vector
+str_vec <- function(x) {
+  x   <- unlist(strsplit(x,","))
+  x   <- gsub("^[ \t]+|[ \t]+$", "", x)  ## trim white spaces
+}
 
 if(com_f){
 
@@ -65,6 +72,9 @@ if(com_f){
         make_option("--targ_file", type="character",
                     help="Lipid target list with columns of m/z and lipid name"),
 
+        make_option("--samp_name", type="character", default="",
+                    help="Sample names. Default is the names of mz XML file"),
+
         ## output files (Excel)
         make_option("--sign_file",type="character", default="signals.tsv",
                     help="Save peak signals (peak table)"),
@@ -95,6 +105,7 @@ if(com_f){
 
       targ_file  = paste0(tool_dir,"LipidList_generator/Positive_LipidList.tsv"),
 
+      samp_name  = "",
       ## Output
       sign_file = paste0(tool_dir,"res/signals.tsv"),
       devi      = TRUE,
@@ -110,16 +121,16 @@ suppressPackageStartupMessages({
 })
 
 ## process multiple input files seperated by comma
-tmp            <- opt$mzxml_file
-tmp            <- unlist(strsplit(tmp,","))
-tmp            <- gsub("^[ \t]+|[ \t]+$", "", tmp)  ## trim white spaces
-opt$mzxml_file <- tmp
+opt$mzxml_file <- str_vec(opt$mzxml_file)
 if (!all(grepl("\\.mzXML",opt$mzxml_file))) {  ## for Galaxy only
   opt$mzxml_file <- paste0(opt$mzxml_file,".mzXML")
 }
 
 targets <- read.table(opt$targ_file, header=T, sep='\t', stringsAsFactors = F)
 targets <- data.table(targets)
+
+## opt$samp_name
+## tmp  <- "030317_mouse_liver_cs16_pos_002.mzXML,030317_mouse_liver_cs16_pos_004.mzXML"
 
 ## ------------------------------------------------------------ 
 ## temporary debug in interactive mode
@@ -129,8 +140,15 @@ if (T){
                    tgts <- peaktable(targets,spec)
                    return(tgts)
                  })
+  
+  ## handle sample names
+  if (opt$samp_name == "") {
+    opt$samp_name  <- opt$mzxml
+  } else {
+    opt$samp_name <- str_vec(opt$samp_name)
+  }
   ## extract only sample names (use greedy match)
-  names(res) <- gsub(".*/|\\..*$","",opt$mzxml_file,perl=T)
+  names(res) <- gsub(".*/|\\..*$","",opt$samp_name,perl=T)
   ## wl-14-08-2018, Tue: Beware that Galaxy changes the original data
   ## filename. Currently no idea how to get the original filename back into
   ## R script.

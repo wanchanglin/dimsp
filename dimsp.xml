@@ -3,6 +3,8 @@ wl-08-08-2018, Wed: commence
 wl-14-08-2018, Tue: Galaxy will change filename of uploaded data. But how 
 to extract the orignal filename info and pass into app for the column names 
 of results?
+wl-28-08-2018, Tue: use 'name' of mzxml_file. Search '.name' in
+https://docs.galaxyproject.org/en/master/dev/schema.html to find the solution
 --> 
  
 
@@ -22,6 +24,8 @@ of results?
         ## input files
         --mzxml_file $mzxml_file 
         --targ_file $targ_file 
+        --samp_name ${','.join([a.name for a in $mzxml_file])}  
+
         ## output files
         --sign_file $sign_file 
         #if $devi:
