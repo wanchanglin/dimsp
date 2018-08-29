@@ -7,6 +7,7 @@
 ## wl-12-08-2018, Mon: Modify and debug
 ## wl-14-08-2018, Tue: the second working version for galaxy. 
 ## wl-28-08-2018, Tue: add 'samp_name' especially for galaxy.
+## wl-29-08-2018, Wed: add 'rtrange','marange' and 'hwidth'
 ## ======================================================================
 
 rm(list=ls(all=T))
@@ -66,24 +67,31 @@ if(com_f){
                     dest="verbose", help="Print little output"),
 
         ## -------------------------------------------------------------------
-        ## input files
+        ## input
         make_option("--mzxml_file", type="character",
                     help="DIMS mzXML files list, seperated by comma"),
         make_option("--targ_file", type="character",
                     help="Lipid target list with columns of m/z and lipid name"),
-
         make_option("--samp_name", type="character", default="",
                     help="Sample names. Default is the names of mz XML file"),
-
+        make_option("--rt_low",type="double", default = 20.0,
+                    help="Start time"),
+        make_option("--rt_high",type="double", default = 60.0,
+                    help="End time"),
+        make_option("--mz_low",type="double", default = 200.0,
+                    help="Start m/z"),
+        make_option("--mz_high",type="double", default = 1200.0,
+                    help="End m/z"),
+        make_option("--hwidth",type="double", default = 0.01,
+                    help="m/z window size/height for peak finder"),
+         
         ## output files (Excel)
         make_option("--sign_file",type="character", default="signals.tsv",
                     help="Save peak signals (peak table)"),
-
         make_option("--devi", type="logical", default=TRUE,
                     help="Return m/z deviation results or not"),
         make_option("--devi_file",type="character", default="deviations.tsv",
                     help="Save m/z deviations"),
-
         make_option("--indi", type="logical", default=TRUE,
                     help="Return each sample's signal and m/z deviation or not"),
         make_option("--indi_file",type="character", default="sam_indi.xlsx",
@@ -98,14 +106,17 @@ if(com_f){
   ## tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
   tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. must be case-sensitive
   opt  <- list(
-      ## input files
+      ## input
       mzxml_file = paste(paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
                          paste0(tool_dir,"test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
                          sep=","),
-
-      targ_file  = paste0(tool_dir,"LipidList_generator/Positive_LipidList.tsv"),
-
-      samp_name  = "",
+      targ_file = paste0(tool_dir,"LipidList_generator/Positive_LipidList.tsv"),
+      samp_name = "",
+      rt_low    = 20.0,
+      rt_high   = 60.0,
+      mz_low    = 200.0,
+      mz_high   = 1200.0,
+      hwidth    = 0.01,
       ## Output
       sign_file = paste0(tool_dir,"res/signals.tsv"),
       devi      = TRUE,
@@ -129,15 +140,14 @@ if (!all(grepl("\\.mzXML",opt$mzxml_file))) {  ## for Galaxy only
 targets <- read.table(opt$targ_file, header=T, sep='\t', stringsAsFactors = F)
 targets <- data.table(targets)
 
-## opt$samp_name
-## tmp  <- "030317_mouse_liver_cs16_pos_002.mzXML,030317_mouse_liver_cs16_pos_004.mzXML"
-
 ## ------------------------------------------------------------ 
 ## temporary debug in interactive mode
 if (T){
   res  <- lapply(opt$mzxml_file, function(x){  ## x = files[[1]]
-                   spec <- suppressMessages(getspectra(filename=x, rt=c(20,60), mz=c(200,1200)))
-                   tgts <- peaktable(targets,spec)
+                   spec <- suppressMessages(getspectra(filename=x, 
+                                                       rt=c(opt$rt_low,opt$rt_high), 
+                                                       mz=c(opt$mz_low, opt$mz_high)))
+                   tgts <- peaktable(targets,spec,opt$hwidth)
                    return(tgts)
                  })
   
@@ -149,9 +159,6 @@ if (T){
   }
   ## extract only sample names (use greedy match)
   names(res) <- gsub(".*/|\\..*$","",opt$samp_name,perl=T)
-  ## wl-14-08-2018, Tue: Beware that Galaxy changes the original data
-  ## filename. Currently no idea how to get the original filename back into
-  ## R script.
 
   ## save(res,file=paste0(tool_dir,"res/res.RData"))
 } else {

@@ -1,5 +1,6 @@
 ## wl-10-07-2018, Tue: Begin to modify
 ## wl-11-07-2018, Wed: test 'getspectra'
+## wl-29-08-2018, Wed: add 'hwidth' for peaktable
 
 #' =======================================================================
 ## This function uses xcms to get the average spectra for a sample and
@@ -23,13 +24,14 @@ getspectra <- function(filename,rt,mz) {
 ## closest peak maximum m/z and intensity values appending results to
 ## variables signals and nearest_mz.  It returns the data.frame peak_id
 ## which includes all results from the targeted analysis of the current
-## spectra 
-peaktable <- function(targets,spectra) {
+## spectra
+## wl-29-08-2018, Wed: add 'hwidth'
+peaktable <- function(targets,spectra,hwidth=0.01) {
   nearest_mz <- vector(length=length(targets$mz)) #predefine length later
   signal     <- vector(length=length(targets$mz)) #predefine length later
   for (i in 1:length(targets$mz)) {
     target        <- targets[i,mz]
-    peak          <- peakfind_midpoint(target,spectra,0.01,warnings)
+    peak          <- peakfind_midpoint(target,spectra,hwidth,warnings)
     nearest_mz[i] <- peak[1,mz]
     signal[i]     <- peak[1,V1]
   }

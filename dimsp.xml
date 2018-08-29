@@ -1,12 +1,16 @@
 <!--
 wl-08-08-2018, Wed: commence
 wl-14-08-2018, Tue: Galaxy will change filename of uploaded data. But how 
-to extract the orignal filename info and pass into app for the column names 
-of results?
-wl-28-08-2018, Tue: use 'name' of mzxml_file. Search '.name' in
-https://docs.galaxyproject.org/en/master/dev/schema.html to find the solution
+  to extract the orignal filename info and pass into app for the column names 
+  of results?
+wl-28-08-2018, Tue: Get the original names of multiple mzxml file
+  1.) use 'name' of mzxml_file. Search '.name' in
+      https://docs.galaxyproject.org/en/master/dev/schema.html to find the 
+      solution
+  2.) Beware that 'samp_name' is not input in Galaxy. it takes names of mzxml 
+      file     
+wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
 --> 
- 
 
 <tool id="dimsp" name="dims_processing" version="0.1.0">
   <description>
@@ -21,11 +25,15 @@ https://docs.galaxyproject.org/en/master/dev/schema.html to find the solution
         #end for
     
       Rscript ${__tool_directory__}/dimsp.R
-        ## input files
+        ## input
         --mzxml_file $mzxml_file 
         --targ_file $targ_file 
         --samp_name ${','.join([a.name for a in $mzxml_file])}  
-
+        --rt_low $rtrange.rt_low
+        --rt_high $rtrange.rt_high
+        --mz_low $mzrange.mz_low
+        --mz_high $mzrange.mz_high
+        --hwidth $mzwindow.hwidth
         ## output files
         --sign_file $sign_file 
         #if $devi:
@@ -41,13 +49,33 @@ https://docs.galaxyproject.org/en/master/dev/schema.html to find the solution
   <!-- =============================================================== -->
   <inputs>
     <param name="mzxml_file" type="data"  format="mzxml" multiple="true" 
-           label="dims data" optional="false"
+          label="dims data" optional="false"
            help="A bunch of dims data (positive or negative mode) in mzXML 
                  format." />
     <param name="targ_file" type="data"  format="tabular" 
            label="Targets matrix" 
            help="A data matrix containing lipid target lists (positive or 
                  negative). " />
+
+    <section name="rtrange" title="Select time range"  expanded="false">
+        <param name="rt_low" type="float" value="20.0"
+               label="Start time" argument="--rt_low" />
+        <param name="rt_high" type="float" value="60.0"
+               label="End time" argument="--rt_high" />
+    </section>
+    <section name="mzrange" title="Select m/z range"  expanded="false">
+        <param name="mz_low" type="float" value="200.0"
+               label="Start m/z" argument="--mz_low" />
+        <param name="mz_high" type="float" value="1200.0"
+               label="End m/z" argument="--mz_high" />
+    </section>
+    <section name="mzwindow" title="Select m/z window size"  expanded="false">
+        <param name="hwidth" type="float" value="0.01"
+               label="m/z window size" 
+               help="Specify a m/z window size(height) for peak finder"
+               argument="--hwidth" />
+    </section>
+
     <param name="devi" type="boolean" truevalue="True" falsevalue="False" 
            checked="True" label="Produce m/z deviations table?" 
            help="A single table with m/z devisations based on lipid target list" /> 
