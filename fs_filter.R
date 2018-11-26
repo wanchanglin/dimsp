@@ -1,4 +1,3 @@
-## ========================================================================
 ## wl-06-11-2018, Tue: filter functions for DIMSP 
 
 library(reshape)
@@ -97,7 +96,6 @@ mv.zene <- function(dat) {
 ##             threshold will be kept.
 ## Return:
 ##   a logical vector of index for keeping features
-## ========================================================================
 .mv_filter <- function(x, thres_mv = 0.30){
   res <- mv.stats(x)
   idx <- res$mv.var < thres_mv
@@ -263,7 +261,6 @@ dist_plot <- function(x,main=""){
 
 ## ========================================================================
 ## lwc-23-04-2010: Fill the zero/NA values by univariate.
-## =======================================================================
 mv.fill <- function(dat,method="mean",ze_ne = FALSE) {
   method <-
     if (is.function(method)) method
@@ -289,7 +286,6 @@ mv.fill <- function(dat,method="mean",ze_ne = FALSE) {
 ## =======================================================================
 ## wl-20-11-2018, Tue: Missing value imputation
 ## 
-## =======================================================================
 mv.impute <- function(x, method=c("mean","median","min","knn","pca")){
   method <- match.arg(method)
   if (method == "knn") {
