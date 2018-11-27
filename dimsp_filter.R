@@ -102,8 +102,26 @@ if(com_f){
   ## tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
   tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. must be case-sensitive
   opt  <- list(
+      ## Input
       peak_file = paste0(tool_dir,"res/pos_peak.tsv"),
+      grp_file_sel = TRUE,
+      grp_file = paste0(tool_dir,"res/grp.tsv"),
       groups = "sample, sample, sample, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
+
+      ## plot output
+      ## rsd_hist_plot = TRUE,
+      ## rsd_box_plot  = TRUE,
+      ## mv_hist_plot  = TRUE,
+      ## mv_box_plot   = TRUE,
+
+      ## pdf files
+      ## rsd_hist_file = paste0(tool_dir,"res/rsd_hist.pdf"),
+      ## rsd_box_file  = paste0(tool_dir,"res/rsd_box.pdf"),
+      ## mv_hist_file  = paste0(tool_dir,"res/mv_hist.pdf"),
+      ## mv_box_file   = paste0(tool_dir,"res/mv_box.pdf"),
+
+      pdf_file = paste0(tool_dir,"res/hist_box.pdf"),
+
       ## QC filtering 
       qc           = TRUE,
       qc_rsd_thres = 20.0,
@@ -125,8 +143,9 @@ if(com_f){
       ## Merge data (sample, qc and blank)
       merge = TRUE,
       ## MV imputation
-      mv_impute = "mean"
-
+      mv_impute = "mean",
+      ## output filtered peak
+      filter_file = paste0(tool_dir, "res/pos_peak_filter.tsv")
   )
 
 }
@@ -148,14 +167,21 @@ peak <- read.table(opt$peak_file, header = T, sep = "\t",
 dat <- peak[,-c(1:2)]
 dat <- as.data.frame(t(dat)) 
 
-## record replicate names
+## record replicate names for final output
 rep_names <- rownames(dat)
 
 ## get sample, qc and blank info
-droups <- opt$groups
-groups <- unlist(strsplit(groups,","))
-groups <- gsub("^[ \t]+|[ \t]+$", "", groups)  ## trim white spaces
-(groups <- factor(groups))
+if (opt$grp_file_sel) {
+  groups <- read.table(opt$grp_file, header = FALSE, sep = "\t")
+  groups <- groups[,1,drop = TRUE]
+} else {
+  groups <- opt$groups
+  groups <- unlist(strsplit(groups,","))
+  groups <- gsub("^[ \t]+|[ \t]+$", "", groups)  ## trim white spaces
+  groups <- factor(groups)
+}
+
+## To-Do: error handling goes here: consistency of dimension 
 
 ## change zero as NA
 dat <- mv.zene(dat)          
@@ -176,14 +202,17 @@ sapply(data,dim)
 val_rsd <- lapply(data,rsd)
 ## sapply(val_rsd, summary)
 p.rsd   <- dist_plot(val_rsd,main="RSD")
-p.rsd$p.box
-p.rsd$p.hist
 
 val_mv <- lapply(data, function(x) { mv.stats(x)$mv.var })
 ## sapply(val_mv, summary)
 p.mv   <- dist_plot(val_mv,main="Percentage of Missing values")
-p.mv$p.box
-p.mv$p.hist
+
+pdf(file = opt$pdf_file, onefile = T)#,width=15, height=10)
+plot(p.rsd$p.box)
+plot(p.rsd$p.hist)
+plot(p.mv$p.box)
+plot(p.mv$p.hist)
+dev.off()
 
 ## ========================================================================
 ## 3) Feature filtering
@@ -219,7 +248,7 @@ if (opt$mv){
 ## ========================================================================
 ## 4) Merge data set
 ## ========================================================================
-
+## want to merge sample, qc and blank?
 if (opt$merge){
   dat <- do.call(rbind,data)
 } else {
@@ -237,5 +266,30 @@ dat <- mv.impute(dat, method = opt$mv_impute)
 ## 6) Tidy up and output
 ## ========================================================================
 
-## to-do: restore original dim names
+## transpose back
+dat <- as.data.frame(t(dat))
+
+## get the replicate names
+col_name <- lapply(levels(groups), function(x){
+  idx <- grep(x,groups)
+  tmp <- rep_names[idx]
+})
+names(col_name) <- levels(groups)
+
+if (opt$merge){
+  col_name <- do.call(c,col_name)
+} else {
+  col_name <- col_name$sample
+}
+names(dat) <- col_name
+
+## get annotation and mz values 
+row_ind <- rownames(dat)
+row_ind <- gsub("[^\\d]","",row_ind, perl=T)
+
+## Combine annotatio, mz and peaks
+peak_filter <- cbind(peak[row_ind,1:2],dat)
+
+## save peak table
+write.table(peak_filter, file=opt$filter_file, sep="\t",row.names=F)
 
