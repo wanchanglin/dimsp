@@ -3,15 +3,26 @@
 ##   choose threshold of MV and RSD.
 ## wl-20-11-2018, Tue: add MV imputation by univariate or multivariate
 ## wl-26-11-2018, Mon: make it work for Galaxy
-
-## to-do:
-##  1) restore original dim names
-##  2) read groups information or input directly
+## wl-27-11-2018, Tue: restore original annotation, mz and replicate info
+## wl-28-11-2018, Wed: test it on command mode and add more error handling.
+##  - Duplicate execution of mv filtering on samples are fine. 
+##  - mv filtering must be executed once. 
+##  - the choice of rsd threshold is tricky. Default of 20 is aggressive in
+##    the most of time. If the number of variables are dropped largely after
+##    rsd-based qc filtering, consider increasing rsd threshold. Or do not
+##    execute this qc filtering and only carry on mv filtering and blank
+##    filtering.
+##  - group info can include the following items and number of each item
+##    must be no less than 2. Any other item cannot be accepted. 
+##    - sample
+##    - sample, qc
+##    - sample, blank
+##    - sample, qc, blank
 
 rm(list=ls(all=T))
 
 ## flag for command-line use or not. If false, only for debug interactively.
-com_f  <- F
+com_f  <- T
 
 ## ------------------------------------------------------------------------
 ## galaxy will stop even if R has warning message
@@ -32,7 +43,7 @@ suppressPackageStartupMessages({
   library(WriteXLS)
 })
 
-## wl-28-08-2018, Tue: Convert a string seperated by comma into character vector
+## wl-28-08-2018, Tue: Convert a string separated by comma into character vector
 str_vec <- function(x) {
   x   <- unlist(strsplit(x,","))
   x   <- gsub("^[ \t]+|[ \t]+$", "", x)  ## trim white spaces
@@ -64,34 +75,58 @@ if(com_f){
 
         ## -------------------------------------------------------------------
         ## input
-        make_option("--mzxml_file", type="character",
-                    help="DIMS mzXML files list, seperated by comma"),
-        make_option("--targ_file", type="character",
-                    help="Lipid target list with columns of m/z and lipid name"),
-        make_option("--samp_name", type="character", default="",
-                    help="Sample names. Default is the names of mz XML file"),
-        make_option("--rt_low",type="double", default = 20.0,
-                    help="Start time"),
-        make_option("--rt_high",type="double", default = 60.0,
-                    help="End time"),
-        make_option("--mz_low",type="double", default = 200.0,
-                    help="Start m/z"),
-        make_option("--mz_high",type="double", default = 1200.0,
-                    help="End m/z"),
-        make_option("--hwidth",type="double", default = 0.01,
-                    help="m/z window size/height for peak finder"),
-         
-        ## output files (Excel)
-        make_option("--sign_file",type="character", default="signals.tsv",
-                    help="Save peak signals (peak table)"),
-        make_option("--devi", type="logical", default=TRUE,
-                    help="Return m/z deviation results or not"),
-        make_option("--devi_file",type="character", default="deviations.tsv",
-                    help="Save m/z deviations"),
-        make_option("--indi", type="logical", default=TRUE,
-                    help="Return each sample's signal and m/z deviation or not"),
-        make_option("--indi_file",type="character", default="sam_indi.xlsx",
-                    help="Save individual sample's signal and m/z deviation in Excel")
+        make_option("--peak_file", type="character",
+                    help="DIMS peak table with the annotation and mz values"),
+        make_option("--grp_file_sel", type="logical", default=TRUE,
+                    help="Load sample, qc and blank info from file or not"),
+        make_option("--grp_file", type="character",
+                    help="sample, qc and blank info file for filtering"),
+        make_option("--groups", type="character", default="",
+                    help="Sample, qc and blank info. Delimited by commas."),
+
+        ## QC filtering 
+        make_option("--qc", type="logical", default=TRUE,
+                    help="Performs QC filtering or not"),
+        make_option("--qc_rsd_thres",type="double", default = 20.0,
+                    help="RSD threshold for QC filtering."),
+        make_option("--qc_mv_filter", type="logical", default=TRUE,
+                    help="Performs MV filtering inside qc filtering or not"),
+        make_option("--qc_mv_qc_sam", type="logical", default=TRUE,
+                    help="Performs mv filtering on qc or sample replicates"),
+        make_option("--qc_mv_thres", type="double", default=0.30,
+                    help="MV percentage threshold for mv filtering inside qc filtering"),
+
+        ## Blank filtering 
+        make_option("--bl", type="logical", default=TRUE,
+                    help="Performs blank filtering or not"),
+        make_option("--bl_method",type="character", default="mean",
+                    help="Blank filtering method. Currently support mean, median and max."),
+        make_option("--bl_factor",type="double", default = 1.0,
+                    help="Factor for blank filtering"),
+        make_option("--bl_mv_filter", type="logical", default=TRUE,
+                    help="Performs MV filtering on sample inside blank filtering or not"),
+        make_option("--bl_mv_thres", type="double", default=0.30,
+                    help="MV percentage threshold for mv filtering inside blank filtering"),
+
+        ## MV filtering 
+        make_option("--mv", type="logical", default=TRUE,
+                    help="Performs MV filtering on sample or not"),
+        make_option("--mv_thres", type="double", default=0.30,
+                    help="MV percentage threshold for mv filtering"),
+
+        ## Merge data (sample, qc and blank)
+        make_option("--merge", type="logical", default=TRUE,
+                    help="Merge sample, qc and blank or not"),
+
+        ## MV imputation
+        make_option("--mv_impute",type="character", default="mean",
+                    help="MV imputation method. Currently support mean, median, min, knn and pca."),
+
+        ## output files
+        make_option("--pdf_file",type="character", default="hist_box.pdf",
+                    help="Save histogram and boxplot for both RSD and MV percentage"),
+        make_option("--filter_file",type="character", default="perk_filter.tsv",
+                    help="Save filtered peak table")
     )
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
@@ -104,29 +139,16 @@ if(com_f){
   opt  <- list(
       ## Input
       peak_file = paste0(tool_dir,"res/pos_peak.tsv"),
-      grp_file_sel = TRUE,
-      grp_file = paste0(tool_dir,"res/grp.tsv"),
-      groups = "sample, sample, sample, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
-
-      ## plot output
-      ## rsd_hist_plot = TRUE,
-      ## rsd_box_plot  = TRUE,
-      ## mv_hist_plot  = TRUE,
-      ## mv_box_plot   = TRUE,
-
-      ## pdf files
-      ## rsd_hist_file = paste0(tool_dir,"res/rsd_hist.pdf"),
-      ## rsd_box_file  = paste0(tool_dir,"res/rsd_box.pdf"),
-      ## mv_hist_file  = paste0(tool_dir,"res/mv_hist.pdf"),
-      ## mv_box_file   = paste0(tool_dir,"res/mv_box.pdf"),
-
-      pdf_file = paste0(tool_dir,"res/hist_box.pdf"),
+      ## input group information directly or load a file?
+      grp_file_sel = T,
+      grp_file     = paste0(tool_dir,"res/grp_sam.tsv"),
+      groups       = "Sample, sample, samplE, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
 
       ## QC filtering 
       qc           = TRUE,
-      qc_rsd_thres = 20.0,
+      qc_rsd_thres = 60.0,
       qc_mv_filter = TRUE,
-      qc_mv_qc_sam = TRUE,
+      qc_mv_qc_sam = FALSE,
       qc_mv_thres  = 0.30,
 
       ## blank filtering
@@ -142,10 +164,13 @@ if(com_f){
 
       ## Merge data (sample, qc and blank)
       merge = TRUE,
+
       ## MV imputation
       mv_impute = "mean",
-      ## output filtered peak
-      filter_file = paste0(tool_dir, "res/pos_peak_filter.tsv")
+
+      ## output
+      pdf_file    = paste0(tool_dir, "res/hist_box.pdf"),
+      filter_file = paste0(tool_dir, "res/peak_filter.tsv")
   )
 
 }
@@ -153,7 +178,6 @@ if(com_f){
 suppressPackageStartupMessages({
   source(paste0(tool_dir,"fs_filter.R"))
 })
-
 
 ## ========================================================================
 ## 1) Data preparation
@@ -163,7 +187,7 @@ suppressPackageStartupMessages({
 peak <- read.table(opt$peak_file, header = T, sep = "\t",
                    fill = T,stringsAsFactors = F)
 
-## get only numberics
+## get only numerics
 dat <- peak[,-c(1:2)]
 dat <- as.data.frame(t(dat)) 
 
@@ -172,16 +196,28 @@ rep_names <- rownames(dat)
 
 ## get sample, qc and blank info
 if (opt$grp_file_sel) {
-  groups <- read.table(opt$grp_file, header = FALSE, sep = "\t")
+  groups <- read.table(opt$grp_file, header = FALSE, sep = "\t",
+                       stringsAsFactors = F)
   groups <- groups[,1,drop = TRUE]
 } else {
   groups <- opt$groups
   groups <- unlist(strsplit(groups,","))
   groups <- gsub("^[ \t]+|[ \t]+$", "", groups)  ## trim white spaces
-  groups <- factor(groups)
 }
+groups <- as.factor(tolower(groups))
 
-## To-Do: error handling goes here: consistency of dimension 
+## error handling goes here: consistency of dimension 
+if (nrow(dat) != length(groups))
+  stop("The number of replicates and length of group is not equal\n")
+
+if (!("sample" %in% levels(groups)))
+  stop("Group must include 'sample'!\n")
+
+if (!all(levels(groups) %in% c("sample", "qc", "blank")))
+  stop("Group item must be 'sample', 'qc' or 'blank'!\n")
+
+if (!all(table(groups) >= 2))
+  stop("Number of each item in group must be at least 2!\n")
 
 ## change zero as NA
 dat <- mv.zene(dat)          
@@ -220,22 +256,27 @@ dev.off()
 
 ## qc filtering
 if (opt$qc){
-  data <- qc_filter(data, 
-                    thres_rsd = opt$qc_rsd_thres,
-                    f_mv      = opt$qc_mv_filter,
-                    f_mv_qc   = opt$qc_mv_qc_sam,
-                    thres_mv  = opt$qc_mv_thres)
-  sapply(data,dim) 
+  if ("qc" %in% levels(groups)){
+    data <- qc_filter(data, 
+                      thres_rsd = opt$qc_rsd_thres,
+                      f_mv      = opt$qc_mv_filter,
+                      f_mv_qc   = opt$qc_mv_qc_sam,
+                      thres_mv  = opt$qc_mv_thres)
+    sapply(data,dim) 
+  }
 }
+
 
 ## blank filtering
 if (opt$bl){
-  data <- blank_filter(data, 
-                       method   = opt$bl_method,
-                       factor   = opt$bl_factor,
-                       f_mv     = opt$bl_mv_filter,
-                       thres_mv = opt$bl_mv_thres)
-  sapply(data,dim)
+  if ("blank" %in% levels(groups)){
+    data <- blank_filter(data, 
+                         method   = opt$bl_method,
+                         factor   = opt$bl_factor,
+                         f_mv     = opt$bl_mv_filter,
+                         thres_mv = opt$bl_mv_thres)
+    sapply(data,dim)
+  }
 }
 
 ## mv filtering
@@ -244,6 +285,10 @@ if (opt$mv){
   sapply(data,dim)
 }
 
+## wl-28-11-2018, Wed: MV filtering can be done in qc_filter,
+## blank_filter or mv_filter. Note that mv filtering on sample must be
+## performed once. Otherwise even mv imputation does not work for large
+## portion of missing values in some variables. 
 
 ## ========================================================================
 ## 4) Merge data set
@@ -287,9 +332,22 @@ names(dat) <- col_name
 row_ind <- rownames(dat)
 row_ind <- gsub("[^\\d]","",row_ind, perl=T)
 
-## Combine annotatio, mz and peaks
+## Combine annotation, mz and peaks
 peak_filter <- cbind(peak[row_ind,1:2],dat)
 
 ## save peak table
 write.table(peak_filter, file=opt$filter_file, sep="\t",row.names=F)
+
+
+## plot output
+## rsd_hist_plot = TRUE,
+## rsd_box_plot  = TRUE,
+## mv_hist_plot  = TRUE,
+## mv_box_plot   = TRUE,
+
+## pdf files
+## rsd_hist_file = paste0(tool_dir,"res/rsd_hist.pdf"),
+## rsd_box_file  = paste0(tool_dir,"res/rsd_box.pdf"),
+## mv_hist_file  = paste0(tool_dir,"res/mv_hist.pdf"),
+## mv_box_file   = paste0(tool_dir,"res/mv_box.pdf"),
 

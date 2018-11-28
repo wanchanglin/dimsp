@@ -1,9 +1,11 @@
 ## wl-06-11-2018, Tue: filter functions for DIMSP 
 
-library(reshape)
-library(lattice)
-library(impute)
-library(pcaMethods)
+suppressPackageStartupMessages({
+  library(reshape)
+  library(lattice)
+  library(impute)
+  library(pcaMethods)
+})
 
 ## =========================================================================
 ## wl-02-06-2011: Relative standard deviation of matrix/data frame in
