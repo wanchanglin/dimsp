@@ -77,7 +77,7 @@ if(com_f){
         ## input
         make_option("--peak_file", type="character",
                     help="DIMS peak table with the annotation and mz values"),
-        make_option("--grp_file_sel", type="logical", default=TRUE,
+        make_option("--grp_file_sel", type="character", default="yes",
                     help="Load sample, qc and blank info from file or not"),
         make_option("--grp_file", type="character",
                     help="sample, qc and blank info file for filtering"),
@@ -140,8 +140,8 @@ if(com_f){
       ## Input
       peak_file = paste0(tool_dir,"res/pos_peak.tsv"),
       ## input group information directly or load a file?
-      grp_file_sel = T,
-      grp_file     = paste0(tool_dir,"res/grp_sam.tsv"),
+      grp_file_sel = "yes",
+      grp_file     = paste0(tool_dir,"res/grp_sam_qc_bl.tsv"),
       groups       = "Sample, sample, samplE, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
 
       ## QC filtering 
@@ -195,7 +195,7 @@ dat <- as.data.frame(t(dat))
 rep_names <- rownames(dat)
 
 ## get sample, qc and blank info
-if (opt$grp_file_sel) {
+if (opt$grp_file_sel == 'yes') {
   groups <- read.table(opt$grp_file, header = FALSE, sep = "\t",
                        stringsAsFactors = F)
   groups <- groups[,1,drop = TRUE]

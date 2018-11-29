@@ -2,7 +2,7 @@
 
 Rscript --vanilla dimsp_filter.R \
   --peak_file "./res/pos_peak.tsv" \
-  --grp_file_sel T \
+  --grp_file_sel "yes" \
   --grp_file  "./res/grp_sam.tsv" \
   --qc_rsd_thres 60.0 \
   --mv T \

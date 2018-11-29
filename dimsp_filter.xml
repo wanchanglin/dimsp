@@ -1,0 +1,238 @@
+<!--
+wl-29-11-2018, Thu: commence
+--> 
+
+<tool id="dimsp_filter" name="dims filtering" version="0.1.0">
+  <description>
+    Direct-infusion mass spectrometry lipidomics peak filtering
+  </description>
+  
+  <!-- =============================================================== -->
+  <command>
+    <![CDATA[
+    
+      Rscript ${__tool_directory__}/dimsp_filter.R
+        --peak_file $peak_file
+
+        ## input group information directly or load a file?
+        --grp_file_sel $grp.grp_file_sel 
+        #if $grp.grp_file_sel=='yes':
+          --grp_file $grp.grp_file
+        #else
+          --groups $grp.groups  
+        #end if
+
+        ## QC filtering
+        #if $qc_filter.qc:
+          --qc_rsd_thres $qc_filter.qc_set.qc_rsd_thres
+          --qc_mv_filter $qc_filter.qc_set.qc_mv_filter
+          --qc_mv_qc_sam $qc_filter.qc_set.qc_mv_qc_sam
+          --qc_mv_thres  $qc_filter.qc_set.qc_mv_thres
+        #end if
+        
+        ## blank filtering
+        #if $bl_filter.bl:
+          --bl_method    $bl_filter.bl_set.bl_method
+          --bl_factor    $bl_filter.bl_set.bl_factor 
+          --bl_mv_filter $bl_filter.bl_set.bl_mv_filter
+          --bl_mv_thres  $bl_filter.bl_set.bl_mv_thres
+        #end if
+
+        ## MV filtering on samples
+        #if $mv_filter.mv: 
+          --mv_thres $mv_filter.mv_set.mv_thres
+        #end if
+
+        ## Merge data (sample, qc and blank)
+        --merge $merge
+
+        ## MV imputation
+        --mv_impute $mv_impute
+
+        ## output
+        --pdf_file     $pdf_file
+        --filter_file  $filter_file
+
+    ]]>
+  </command>
+
+  <!-- =============================================================== -->
+  <inputs>
+    <param name="peak_file" type="data"  format="tabular"
+           label="dims peak table"
+           help="DIMS peak table with annotation and mz values in the first
+           two columns. Rows are replicates." />
+
+    <!-- =============================================================== -->
+    <conditional name="grp">
+      <param name="grp_file_sel" type="select"
+             label="Input groups from file?" 
+             help="You can load group from a file or enter below manually.">
+        <option value="yes">Use group file</option>
+        <option value="no">Enter group manually</option>
+      </param>
+
+      <when value="yes">
+        <param name="grp_file" type="data"  format="txt" 
+               label="Group matrix" 
+               help="A data matrix containing only one column. The cell value 
+               must be 'sample','qc' and 'blank'. The contents in the column 
+               must be one of them: 1) sample; 2) sample, qc; 3) sample,blank
+               4) sample, qc, blank. And number of each content must be no
+               less than 2.  " />
+      </when>
+         
+      <when value="no">
+        <param name="groups" type="text" value=""
+               label="Specify group information"
+               help="Enter group contents delimited by a comma. E.e., 'sample',
+               'qc','blank'. The length of contents must be the same as the 
+               number of replicates. Any other names are not allowed." />
+      </when>
+      
+    </conditional>
+
+    <!-- =============================================================== -->
+    <conditional name="qc_filter">
+      <param name="qc"
+             type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
+             label="QC Filtering"
+             help="Performs QC filtering if you provide QC information" />
+
+      <when value="TRUE">
+        <section name="qc_set" title="QC Filtering">
+
+          <param name="qc_rsd_thres" type="float" value="20" 
+                 label="Specify RSD threshold"
+                 help="Inter RSD threshold. The default is 20." /> 
+
+          <param name="qc_mv_filter" type="boolean" 
+                 truevalue="TRUE" falsevalue="FALSE" checked="true"
+                 label="MV filtering or not"
+                 help="Performs MV filtering inside qc filtering or not"/>
+
+          <param name="qc_mv_qc_sam" type="boolean" 
+                 truevalue="TRUE" falsevalue="FALSE" checked="true"
+                 label="MV filtering on sample or qc replicates"
+                 help="Performs MV filtering on QC or sample replicates"/>
+
+          <param name="qc_mv_thres" type="float" value="0.30" 
+                 label="Specify MV perentage threshold"
+                 help="MV percentage threshold for mv filtering inside qc filtering" /> 
+        </section>
+
+      </when>
+
+      <when value="FALSE">
+      </when>
+
+    </conditional>
+
+    <!-- =============================================================== -->
+    <conditional name="bl_filter">
+      <param name="bl"
+             type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
+             label="Blank Filtering"
+             help="Performs blank filtering if you provide blank information" />
+
+      <when value="TRUE">
+        <section name="bl_set" title="Blank Filtering">
+
+          <param name="bl_method" type="select"
+                 label="Select a method for blank filtering"
+                 help="Blank filtering method. Currently support mean, median and max.">
+            <option value="mean" selected="true">mean</option>
+            <option value="median">median</option>
+            <option value="max">max</option>
+          </param>
+
+          <param name="bl_factor" type="float" value="1" 
+                 label="Specify factor"
+                 help="Factor for blank filtering" /> 
+
+          <param name="bl_mv_filter" type="boolean" 
+                 truevalue="TRUE" falsevalue="FALSE" checked="true"
+                 label="MV filtering or not"
+                 help="Performs MV filtering inside blank filtering or not"/>
+
+          <param name="bl_mv_thres" type="float" value="0.30" 
+                 label="Specify MV perentage threshold"
+                 help="MV percentage threshold for mv filtering inside blank filtering" /> 
+        </section>
+
+      </when>
+
+      <when value="FALSE">
+      </when>
+
+    </conditional>
+
+
+    <!-- =============================================================== -->
+    <conditional name="mv_filter">
+      <param name="mv"
+             type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
+             label="MV Filtering"
+             help="Performs MV filtering" />
+
+      <when value="TRUE">
+        <section name="mv_set" title="Missing value Filtering">
+
+          <param name="mv_thres" type="float" value="0.30" 
+                 label="Specify MV perentage threshold"
+                 help="MV percentage threshold for MV filtering" /> 
+        </section>
+
+      </when>
+
+      <when value="FALSE">
+      </when>
+
+    </conditional>
+
+    <!-- =============================================================== -->
+    <param name="merge" type="boolean" truevalue="True" falsevalue="False" 
+           checked="false" label="Merge sample, qc and blank or not" 
+           help="Merge sample, qc and blank or not" /> 
+
+    <param name="mv_impute" type="select"
+      label="Select a method for MV imputation"
+      help="MV imputation method. Currently support mean, median, min, knn and pca.">
+      <option value="knn" selected="true">knn</option>
+      <option value="pca">pca</option>
+      <option value="mean">mean</option>
+      <option value="median">median</option>
+      <option value="min">min</option>
+    </param>
+
+  </inputs>
+
+
+  <!-- =============================================================== -->
+  <outputs>
+    <data format="tabular" name="filter_file" 
+          label="Filtered peak signals on ${on_string}"/>
+    <data format="pdf" name="pdf_file" 
+          label="Histogram and boxplot for both RSD and MV percentage 
+                 on ${on_string}" />
+  </outputs>
+
+  <!-- =============================================================== -->
+  <tests>
+    <test>
+      <param name="peak_file" value="pos_peak.tsv" />
+      <param name="grp_file" value="grp.tsv" />
+      <param name="mv" value="TRUE" /> 
+      <param name="merge" value="TRUE" /> 
+      <output name="filter_file" file="peak_filter.tsv" />
+      <output name="pdf_file" file="hist_box.pdf" />
+    </test>
+  </tests>
+
+
+  <!-- =============================================================== -->
+  <help>
+    This is a basic Galaxy wrapper for dims-processing. 
+  </help>
+
+</tool>
