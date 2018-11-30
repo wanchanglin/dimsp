@@ -4,7 +4,7 @@
 ## wl-20-11-2018, Tue: add MV imputation by univariate or multivariate
 ## wl-26-11-2018, Mon: make it work for Galaxy
 ## wl-27-11-2018, Tue: restore original annotation, mz and replicate info
-## wl-28-11-2018, Wed: test it on command mode and add more error handling.
+## wl-28-11-2018, Wed: test on command mode and add more error handling.
 ##  - Duplicate execution of mv filtering on samples are fine. 
 ##  - mv filtering must be executed once. 
 ##  - the choice of rsd threshold is tricky. Default of 20 is aggressive in
@@ -18,6 +18,8 @@
 ##    - sample, qc
 ##    - sample, blank
 ##    - sample, qc, blank
+## wl-29-11-2018, Thu: debug and polish for Galaxy (command mode)
+##  - grp_file_sel: change from boolean to character purely for galaxy
 
 rm(list=ls(all=T))
 
@@ -135,7 +137,7 @@ if(com_f){
 
 } else {
   ## tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
-  tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. must be case-sensitive
+  tool_dir <- "~/my_galaxy/dimsp/"  ## for linux. Must be case-sensitive
   opt  <- list(
       ## Input
       peak_file = paste0(tool_dir,"res/pos_peak.tsv"),
@@ -199,6 +201,9 @@ if (opt$grp_file_sel == 'yes') {
   groups <- read.table(opt$grp_file, header = FALSE, sep = "\t",
                        stringsAsFactors = F)
   groups <- groups[,1,drop = TRUE]
+  ## wl-30-11-2018, Fri: group file must be one column without header. The 
+  ##  file extension can be tsv, csv or txt. sep="\t" takes no effect on one 
+  ##  column file.
 } else {
   groups <- opt$groups
   groups <- unlist(strsplit(groups,","))
@@ -206,7 +211,7 @@ if (opt$grp_file_sel == 'yes') {
 }
 groups <- as.factor(tolower(groups))
 
-## error handling goes here: consistency of dimension 
+## error handling for group info. 
 if (nrow(dat) != length(groups))
   stop("The number of replicates and length of group is not equal\n")
 
@@ -229,7 +234,6 @@ data <- lapply(levels(groups), function(x){
 })
 names(data) <- levels(groups)
 sapply(data,dim)
-
 
 ## ========================================================================
 ## 2) Missing value and RSD checking
@@ -300,10 +304,12 @@ if (opt$merge){
   dat <- data$sample
 }
 
-
 ## ========================================================================
 ## 5) Missing value imputation
 ## ========================================================================
+## wl-30-11-2018, Fri: mv imputation takes two categories: univariate and
+##   multivariate. 'mean', 'median' and 'min' belongs to the former while
+##   'knn' and 'pca' the later.
 
 dat <- mv.impute(dat, method = opt$mv_impute)
 
@@ -337,17 +343,4 @@ peak_filter <- cbind(peak[row_ind,1:2],dat)
 
 ## save peak table
 write.table(peak_filter, file=opt$filter_file, sep="\t",row.names=F)
-
-
-## plot output
-## rsd_hist_plot = TRUE,
-## rsd_box_plot  = TRUE,
-## mv_hist_plot  = TRUE,
-## mv_box_plot   = TRUE,
-
-## pdf files
-## rsd_hist_file = paste0(tool_dir,"res/rsd_hist.pdf"),
-## rsd_box_file  = paste0(tool_dir,"res/rsd_box.pdf"),
-## mv_hist_file  = paste0(tool_dir,"res/mv_hist.pdf"),
-## mv_box_file   = paste0(tool_dir,"res/mv_box.pdf"),
 

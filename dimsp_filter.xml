@@ -1,8 +1,9 @@
 <!--
 wl-29-11-2018, Thu: commence
+wl-30-11-2018, Fri: add some help information
 --> 
 
-<tool id="dimsp_filter" name="dims filtering" version="0.1.0">
+<tool id="dimsp_filter" name="DIMS filtering" version="0.1.0">
   <description>
     Direct-infusion mass spectrometry lipidomics peak filtering
   </description>
@@ -59,14 +60,14 @@ wl-29-11-2018, Thu: commence
   <!-- =============================================================== -->
   <inputs>
     <param name="peak_file" type="data"  format="tabular"
-           label="dims peak table"
+           label="DIMS peak table"
            help="DIMS peak table with annotation and mz values in the first
            two columns. Rows are replicates." />
 
     <!-- =============================================================== -->
     <conditional name="grp">
       <param name="grp_file_sel" type="select"
-             label="Input groups from file?" 
+             label="Input group information from a file?" 
              help="You can load group from a file or enter below manually.">
         <option value="yes">Use group file</option>
         <option value="no">Enter group manually</option>
@@ -74,14 +75,15 @@ wl-29-11-2018, Thu: commence
 
       <when value="yes">
         <param name="grp_file" type="data"  format="txt" 
-               label="Group matrix" 
+               label="Group file" 
                help="A data matrix containing only one column. The cell value 
-               must be 'sample','qc' and 'blank'. The contents in the column 
+               must be 'sample','qc' or 'blank'. The contents in the column 
                must be one of them: 1) sample; 2) sample, qc; 3) sample,blank
                4) sample, qc, blank. And number of each content must be no
                less than 2.  " />
+             <!-- wl-30-11-2018, Fri: cannot use format="tabular". It does
+                  not treat one column data file as tabular format.  -->   
       </when>
-         
       <when value="no">
         <param name="groups" type="text" value=""
                label="Specify group information"
@@ -109,16 +111,18 @@ wl-29-11-2018, Thu: commence
           <param name="qc_mv_filter" type="boolean" 
                  truevalue="TRUE" falsevalue="FALSE" checked="true"
                  label="MV filtering or not"
-                 help="Performs MV filtering inside qc filtering or not"/>
+                 help="Performs MV filtering inside QC filtering or not"/>
 
           <param name="qc_mv_qc_sam" type="boolean" 
                  truevalue="TRUE" falsevalue="FALSE" checked="true"
-                 label="MV filtering on sample or qc replicates"
-                 help="Performs MV filtering on QC or sample replicates"/>
+                 label="MV filtering on 'sample' or 'qc' replicates"
+                 help="Performs MV filtering on 'qc' or 'sample' replicates. 
+                       TRUE for 'qc' and FALSE for 'sample'."/>
 
           <param name="qc_mv_thres" type="float" value="0.30" 
-                 label="Specify MV perentage threshold"
-                 help="MV percentage threshold for mv filtering inside qc filtering" /> 
+                 label="Specify MV percentage threshold"
+                 help="MV percentage threshold for mv filtering inside QC
+                       filtering" /> 
         </section>
 
       </when>
@@ -140,7 +144,8 @@ wl-29-11-2018, Thu: commence
 
           <param name="bl_method" type="select"
                  label="Select a method for blank filtering"
-                 help="Blank filtering method. Currently support mean, median and max.">
+                 help="Blank filtering method. Currently support 'mean', 
+                       'median' and 'max'.">
             <option value="mean" selected="true">mean</option>
             <option value="median">median</option>
             <option value="max">max</option>
@@ -148,16 +153,18 @@ wl-29-11-2018, Thu: commence
 
           <param name="bl_factor" type="float" value="1" 
                  label="Specify factor"
-                 help="Factor for blank filtering" /> 
+                 help="Multiplying factor for blank filtering" /> 
 
           <param name="bl_mv_filter" type="boolean" 
                  truevalue="TRUE" falsevalue="FALSE" checked="true"
                  label="MV filtering or not"
-                 help="Performs MV filtering inside blank filtering or not"/>
+                 help="Performs MV filtering on 'sample' inside blank 
+                       filtering or not"/>
 
           <param name="bl_mv_thres" type="float" value="0.30" 
-                 label="Specify MV perentage threshold"
-                 help="MV percentage threshold for mv filtering inside blank filtering" /> 
+                 label="Specify MV percentage threshold"
+                 help="MV percentage threshold for MV filtering inside 
+                       blank filtering" /> 
         </section>
 
       </when>
@@ -166,43 +173,41 @@ wl-29-11-2018, Thu: commence
       </when>
 
     </conditional>
-
 
     <!-- =============================================================== -->
     <conditional name="mv_filter">
       <param name="mv"
              type="boolean" truevalue="TRUE" falsevalue="FALSE" checked="true"
-             label="MV Filtering"
-             help="Performs MV filtering" />
-
+             label="MV Filtering on 'sample'"
+             help="Performs MV filtering on 'sample'. Should do if no MV 
+                   filtering is performed inside QC or blank filtering." />
       <when value="TRUE">
         <section name="mv_set" title="Missing value Filtering">
-
           <param name="mv_thres" type="float" value="0.30" 
-                 label="Specify MV perentage threshold"
+                 label="Specify MV percentage threshold"
                  help="MV percentage threshold for MV filtering" /> 
         </section>
-
       </when>
 
       <when value="FALSE">
       </when>
-
     </conditional>
 
     <!-- =============================================================== -->
     <param name="merge" type="boolean" truevalue="True" falsevalue="False" 
-           checked="false" label="Merge sample, qc and blank or not" 
-           help="Merge sample, qc and blank or not" /> 
+           checked="false" label="Merge 'sample', 'qc' and 'blank' or not" 
+           help="Merge 'sample', 'qc' and 'blank' for further analysis or 
+                 not" /> 
 
     <param name="mv_impute" type="select"
-      label="Select a method for MV imputation"
-      help="MV imputation method. Currently support mean, median, min, knn and pca.">
-      <option value="knn" selected="true">knn</option>
-      <option value="pca">pca</option>
-      <option value="mean">mean</option>
-      <option value="median">median</option>
-      <option value="min">min</option>
+           label="Select a method for MV imputation"
+           help="MV imputation method. Currently support 'mean', 'median', 
+                 'min', 'knn' and 'pca'.">
+           <option value="knn" selected="true">knn</option>
+           <option value="pca">pca</option>
+           <option value="mean">mean</option>
+           <option value="median">median</option>
+           <option value="min">min</option>
     </param>
 
   </inputs>
@@ -220,7 +225,7 @@ wl-29-11-2018, Thu: commence
   <!-- =============================================================== -->
   <tests>
     <test>
-      <param name="peak_file" value="pos_peak.tsv" />
+      <param name="peak_file" value="peak.tsv" />
       <param name="grp_file" value="grp.tsv" />
       <param name="mv" value="TRUE" /> 
       <param name="merge" value="TRUE" /> 
@@ -231,8 +236,22 @@ wl-29-11-2018, Thu: commence
 
 
   <!-- =============================================================== -->
-  <help>
-    This is a basic Galaxy wrapper for dims-processing. 
-  </help>
+<help>
+---------------
+DIMPS Filtering
+---------------
+
+Description
+-----------
+
+This tool performs filtering on the DIMS peaks produced by
+'dims-processing'. Current three methods are implemented:
+
+- QC filtering: filtering based on the RSD of QC samples. The peaks will be removed  
+
+
+
+
+</help>
 
 </tool>
