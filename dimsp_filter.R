@@ -133,7 +133,7 @@ if(com_f){
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
                     args = commandArgs(trailingOnly = TRUE))
-  ## print(opt)
+  print(opt)
 
 } else {
   ## tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
@@ -197,7 +197,7 @@ dat <- as.data.frame(t(dat))
 rep_names <- rownames(dat)
 
 ## get sample, qc and blank info
-if (opt$grp_file_sel == 'yes') {
+if (opt$grp_file_sel == "yes") {
   groups <- read.table(opt$grp_file, header = FALSE, sep = "\t",
                        stringsAsFactors = F)
   groups <- groups[,1,drop = TRUE]

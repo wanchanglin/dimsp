@@ -2,8 +2,8 @@
 
 Rscript --vanilla dimsp_filter.R \
   --peak_file "./res/pos_peak.tsv" \
-  --grp_file_sel "yes" \
-  --grp_file  "./res/grp_sam_qc.tsv" \
+  --grp_file_sel "no" \
+  --groups  "Sample,sample, samplE, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank" \
   --qc_rsd_thres 60.0 \
   --mv T \
   --merge F \
