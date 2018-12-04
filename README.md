@@ -1,17 +1,18 @@
 # dimsp for Galaxy #
 
-This is Galaxy tool for R tools `dims_processing` for data processing of
-direct-infusion mass spectrometry-based lipidomics data.
+Galaxy tool for Direct-Infusion Mass Spectrometry (DIMS) based lipidomics
+data processing and filtering.
 
-For details, see [dims_processing](https://github.com/hallz/dims_processing). 
+For details how to get annotation and peak table, see
+[dims_processing](https://github.com/hallz/dims_processing). 
 
 ## Installation ##
 
 You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
 [R](https://cran.r-project.org/) under Linux. 
 
-- Install four R packages `optparse`, `WriteXLS`, `xcms` and `data.table`
-  inside R. 
+- Install R packages `optparse`, `WriteXLS`, `xcms`, `data.table`,
+  `reshape`, `lattice`, `impute` and `pcaMethods` inside R. 
 - Use `git` to clone this tool
 
   ```bash
@@ -32,15 +33,17 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
     
     <section id="MyTools" name="My Tools">
       <tool file="/path/to/dimsp/dimsp.xml" />
+      <tool file="/path/to/dimsp/dimsp_filter.xml" />
     </section>
 
   </toolbox>
   ```
 
 - Test data:
-  - positive and negative DIMS files in mzXML are located in `test-data`.
+  - mzXML files are located in `test-data`.
   - Lipid lists in TSV(Tab Separated Values) format are in directory 
     `LipidList_generator`. 
+  - `dimsp_filter` test files in TSV format are also in `test-data`.
 
 ## To-Do ##
 

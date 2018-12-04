@@ -144,7 +144,7 @@ if(com_f){
       ## input group information directly or load a file?
       grp_file_sel = "yes",
       grp_file     = paste0(tool_dir,"res/grp_sam_qc_bl.tsv"),
-      groups       = "Sample, sample, samplE, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
+      groups       = "sample, sample, sample, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
 
       ## QC filtering 
       qc           = TRUE,
