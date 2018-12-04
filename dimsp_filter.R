@@ -133,7 +133,7 @@ if(com_f){
 
   opt <- parse_args(object=OptionParser(option_list=option_list),
                     args = commandArgs(trailingOnly = TRUE))
-  print(opt)
+  ## print(opt)
 
 } else {
   ## tool_dir <- "C:/R_lwc/dimsp/"         ## for windows
@@ -233,6 +233,7 @@ data <- lapply(levels(groups), function(x){
   tmp <- dat[idx,]
 })
 names(data) <- levels(groups)
+cat("data dimension:\n")
 sapply(data,dim)
 
 ## ========================================================================
@@ -266,6 +267,7 @@ if (opt$qc){
                       f_mv      = opt$qc_mv_filter,
                       f_mv_qc   = opt$qc_mv_qc_sam,
                       thres_mv  = opt$qc_mv_thres)
+    cat("data dimension after qc filtering:\n")
     sapply(data,dim) 
   }
 }
@@ -279,6 +281,7 @@ if (opt$bl){
                          factor   = opt$bl_factor,
                          f_mv     = opt$bl_mv_filter,
                          thres_mv = opt$bl_mv_thres)
+    cat("data dimension after blank filtering:\n")
     sapply(data,dim)
   }
 }
@@ -286,6 +289,7 @@ if (opt$bl){
 ## mv filtering
 if (opt$mv){
   data <- mv_filter(data, thres_mv = opt$mv_thres)
+  cat("data dimension after mv filtering:\n")
   sapply(data,dim)
 }
 

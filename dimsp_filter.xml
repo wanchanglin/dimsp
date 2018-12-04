@@ -3,7 +3,7 @@ wl-29-11-2018, Thu: commence
 wl-30-11-2018, Fri: add some help information
 --> 
 
-<tool id="dimsp_filter" name="DIMS_Filtering" version="0.1.0">
+<tool id="dimsp_filter" name="dims_filtering" version="0.1.0">
   <description>
     Direct-infusion mass spectrometry lipidomics peak filtering
   </description>
