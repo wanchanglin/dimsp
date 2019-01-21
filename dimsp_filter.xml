@@ -237,11 +237,9 @@ wl-30-11-2018, Fri: add some help information
 
   <!-- =============================================================== -->
 <help>
----------------
 DIMPS Filtering
----------------
+===============
 
------------
 Description
 -----------
 
@@ -266,7 +264,6 @@ MV filtering
   should be employed. Without MV filtering, even 'MV imputation' will fail
   in some cases.
 
-------
 Inputs
 ------
 
@@ -353,7 +350,6 @@ providing the group information:
 
   Note that this table does not includes any header.   
 
-----------
 Parameters
 ----------
 
@@ -412,7 +408,6 @@ Missing value imputation. Currently two categorical methods are available:
 - **Multivariate**: includes *knn* (default) and *pca*
 
 
-----------
 Outputs
 ----------
 
