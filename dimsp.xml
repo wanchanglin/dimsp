@@ -53,7 +53,7 @@ wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
            help="A bunch of dims data (positive or negative mode) in mzXML 
                  format." />
     <param name="targ_file" type="data"  format="tabular" 
-           label="Targets matrix" 
+           label="Target matrix" 
            help="A data matrix containing lipid target lists (positive or 
                  negative). " />
 
@@ -82,8 +82,8 @@ wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
     <param name="indi" type="boolean" truevalue="True" falsevalue="False" 
            checked="True" 
            label="Produce signal and deviation for each individual sample?"
-           help="A XLSX file containing sheets of individual sample's signals
-                 and m/z deviations." />
+           help="An Excel XLSX file containing sheets of individual sample's
+                 signals and m/z deviations." />
   </inputs>
 
 
@@ -139,24 +139,24 @@ will be either positive or negative mode. They cannot be mixed up.
 .. _ProteoWizard: http://proteowizard.sourceforge.net/
 
 
-**\2. Targets matrix**
+**\2. Target matrix**
   
 The target matrix in tabular format(``.tsv``) includes lipid target lists in
 two columns. The following table is an example (positive mode):
 
 ========    ==========================================
-mz	    name
+mz          name
 ========    ==========================================
 185.1547    FA(11:0)_[M-H]1-
 197.1547    FA(12:1)_[M-H]1-
 199.1704    FA(12:0)_[M-H]1-
 209.1183    OCT(C12H18O3)_jasmonic acid_[M-H]1-
-211.134	    OCT(C12H20O3)_dihydrojasmonic_acid_[M-H]1-
-213.186	    FA(13:0)_[M-H]1-
+211.134     OCT(C12H20O3)_dihydrojasmonic_acid_[M-H]1-
+213.186     FA(13:0)_[M-H]1-
 215.1653    FA(12:0)-OH_[M-H]1-
-223.134	    OCT(C13H20O3)_methyl_jasmonate_[M-H]1-
+223.134     OCT(C13H20O3)_methyl_jasmonate_[M-H]1-
 225.1132    OCT(C12H18O4)_[M-H]1-
-225.186	    FA(14:1)_[M-H]1-
+225.186     FA(14:1)_[M-H]1-
 ========    ==========================================
 
 Note that the target matrix file should be either positive or negative,
@@ -169,14 +169,14 @@ Parameters
 Select time range
 ~~~~~~~~~~~~~~~~~
 
-- The time range for positive mode is 20-60s
-- The time range for negative mode is 80-120s
+- The time range for positive mode is 20 - 60s
+- The time range for negative mode is 80 - 120s
 
 Select m/z range
 ~~~~~~~~~~~~~~~~
 
-- Select m/z range of 200-1200 for positive mode 
-- Select m/z range of 185-1200 for negative mode
+- Select m/z range of 200 - 1200 for positive mode 
+- Select m/z range of 185 - 1200 for negative mode
 
 Select m/z window size
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -192,18 +192,18 @@ Signal Peak Table
 
 The default output is the signal table in tabular format:
 
-====================================== ========  ===========   =======  ==========   
-name	                               mz	 pos-001       pos-002	pos-003	    
-====================================== ========  ===========   =======  ==========   
-PS_32:5_[M+Na]1+	               748.416	 0	       0	0	    
-PE_37:7_[M+H]1+ / PA_39:8_[M+NH4]1+    748.4912	 104.3298294   0	136.4149127 
-PS_33:1_[M+H]1+ / PG_33:3_[M+NH4]1+    748.5123	 755.8055022   0	539.1916569 
-PE-P_38:6_[M+H]1+	               748.5276	 862.2107571   0	1028.002626 
-PC-O_34:0_[M+H]1+ / PE-O_37:0_[M+H]1+  748.6215	 0	       0	0	    
-TG_43:3_[M+NH4]1+	               748.645	 0	       0	0	    
-DG_44:3_[M+NH4]1+	               748.6814	 13201.64570   8790.56  0
-2H-IS_PE_[M+H]1+	               748.7244	 113052.2131   0	81301.89354 
-====================================== ========  ===========   =======  ==========   
+====================================== ========  ===========   ========   ==========   
+name                                   mz        pos-001       pos-002    pos-003     
+====================================== ========  ===========   ========   ==========   
+PS_32:5_[M+Na]1+                       748.416   0             0          0           
+PE_37:7_[M+H]1+ / PA_39:8_[M+NH4]1+    748.4912  104.3298294   0          136.4149127 
+PS_33:1_[M+H]1+ / PG_33:3_[M+NH4]1+    748.5123  755.8055022   0          539.1916569 
+PE-P_38:6_[M+H]1+                      748.5276  862.2107571   0          1028.002626 
+PC-O_34:0_[M+H]1+ / PE-O_37:0_[M+H]1+  748.6215  0             0          0           
+TG_43:3_[M+NH4]1+                      748.645   0             0          0           
+DG_44:3_[M+NH4]1+                      748.6814  13201.64570   8790.560   0
+2H-IS_PE_[M+H]1+                       748.7244  113052.2131   0          81301.89354 
+====================================== ========  ===========   ========   ==========   
 
 Deviations table
 ~~~~~~~~~~~~~~~~
@@ -214,9 +214,10 @@ produced if **Produce m/z deviations table?** is TRUE.
 Individual table
 ~~~~~~~~~~~~~~~~
 
-A Excel ``XLSX`` file containing each sample's signals and m/z deviations
+An Excel ``XLSX`` file containing each sample's signals and m/z deviations
 will be produced if **Produce signal and deviation for each individual
-sample?** is set as TRUE.
+sample?** is set as TRUE. This file cannot shown in Galaxy but can be
+downloaded.
 
 
   </help>
