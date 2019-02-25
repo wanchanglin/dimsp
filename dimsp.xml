@@ -26,21 +26,21 @@ wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
     
       Rscript ${__tool_directory__}/dimsp.R
         ## input
-        --mzxml_file $mzxml_file 
-        --targ_file $targ_file 
+        --mzxml_file '$mzxml_file' 
+        --targ_file '$targ_file' 
         --samp_name ${','.join([a.name for a in $mzxml_file])}  
-        --rt_low $rtrange.rt_low
-        --rt_high $rtrange.rt_high
-        --mz_low $mzrange.mz_low
-        --mz_high $mzrange.mz_high
-        --hwidth $mzwindow.hwidth
+        --rt_low '$rtrange.rt_low'
+        --rt_high '$rtrange.rt_high'
+        --mz_low '$mzrange.mz_low'
+        --mz_high '$mzrange.mz_high'
+        --hwidth '$mzwindow.hwidth'
         ## output files
-        --sign_file $sign_file 
+        --sign_file '$sign_file' 
         #if $devi:
-           --devi_file $devi_file 
+           --devi_file '$devi_file' 
         #end if
         #if $indi:
-          --indi_file $indi_file 
+          --indi_file '$indi_file' 
         #end if
 
     ]]>
