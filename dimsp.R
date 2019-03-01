@@ -9,13 +9,14 @@
 #' wl-28-08-2018, Tue: add 'samp_name' especially for galaxy.
 #' wl-29-08-2018, Wed: add 'rtrange','marange' and 'hwidth'
 #' wl-01-03-2019, Fri: tidy up for outline/tree view in vim and reformat
-#'   with R package 'styler'
+#'   with R package 'styler'. Remove input file extension checking so it
+#'   supports both mzXML and mzML.
 
 ## ==== General settings ====
 rm(list = ls(all = T))
 
 #' flag for command-line use or not. If false, only for debug interactively.
-com_f <- F
+com_f <- T
 
 #' galaxy will stop even if R has warning message
 options(warn = -1) #' disable R warning. Turn back: options(warn=0)
@@ -140,10 +141,16 @@ if (com_f) {
   tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
   opt <- list(
     #' input
-    mzxml_file = paste(paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
-      paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
-      sep = ","
-    ),
+    #' mzxml_file = paste(paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
+    #'   paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
+    #'   sep = ","
+    #' ),
+    mzxml_file = paste(paste0(tool_dir, "test-data/01_sample.mzML"),
+                       paste0(tool_dir, "test-data/02_sample.mzML"),
+                       paste0(tool_dir, "test-data/03_sample.mzML"),
+                       paste0(tool_dir, "test-data/04_sample.mzML"),
+                       sep = ","
+                       ),
     targ_file = paste0(tool_dir, "LipidList_generator/Positive_LipidList.tsv"),
     samp_name = "",
     rt_low = 20.0,
@@ -168,9 +175,12 @@ suppressPackageStartupMessages({
 
 #' process multiple input files seperated by comma
 opt$mzxml_file <- str_vec(opt$mzxml_file)
-if (!all(grepl("\\.mzXML", opt$mzxml_file))) { #' for Galaxy only
-  opt$mzxml_file <- paste0(opt$mzxml_file, ".mzXML")
-}
+
+#' wl-01-03-2019, Fri: No need any more. Use cheetah in Galaxy XML to link 
+#' ether mzXML or mzML.
+#' if (!all(grepl("\\.mzXML", opt$mzxml_file))) { #' for Galaxy only
+#'   opt$mzxml_file <- paste0(opt$mzxml_file, ".mzXML")
+#' }
 
 targets <- read.table(opt$targ_file, header = T, sep = "\t", stringsAsFactors = F)
 targets <- data.table(targets)

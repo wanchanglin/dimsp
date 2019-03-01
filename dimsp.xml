@@ -10,6 +10,7 @@ wl-28-08-2018, Tue: Get the original names of multiple mzxml file
   2.) Beware that 'samp_name' is not input in Galaxy. it takes names of mzxml 
       file     
 wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
+wl-01-03-2019, Fri: add mutiple input data format, mzXML and mzML
 --> 
 
 <tool id="dimsp" name="dims_processing" version="0.1.0">
@@ -20,10 +21,14 @@ wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
   <!-- =============================================================== -->
   <command>
     <![CDATA[
-        #for $file in $mzxml_file:
-	      ln -f -s ${file} ${file}.mzXML &&
-        #end for
-    
+      #for $file in $mzxml_file:
+        #if $file.is_of_type("mzxml")
+          ln -s ${file} ${file}.mzXML &&
+        #else
+          ln -s ${file} ${file}.mzML &&
+        #end if  
+      #end for
+
       Rscript ${__tool_directory__}/dimsp.R
         ## input
         --mzxml_file '$mzxml_file' 
@@ -48,10 +53,10 @@ wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
 
   <!-- =============================================================== -->
   <inputs>
-    <param name="mzxml_file" type="data"  format="mzxml" multiple="true" 
+    <param name="mzxml_file" type="data"  format="mzxml,mzml" multiple="true" 
           label="dims data" optional="false"
            help="A bunch of dims data (positive or negative mode) in mzXML 
-                 format." />
+                 or mzML format." />
     <param name="targ_file" type="data"  format="tabular" 
            label="Target matrix" 
            help="A data matrix containing lipid target lists (positive or 
