@@ -135,10 +135,11 @@ Inputs
 
 **\1. DIMS data**
 
-The lipidomics data format is ``mzXML`` which can be converted from raw data
-by ``MSConvert`` of ProteoWizard_. Each file represents one sample or
-replicate. Select multiple ``mzXML`` files for processing. The input data
-will be either positive or negative mode. They cannot be mixed up.
+The lipidomics data format is ``mzXML`` or ``mzML`` which can be converted 
+from raw data by ``MSConvert`` of ProteoWizard_. Each file represents one 
+sample or replicate. Select multiple ``mzXML`` or ``mzML`` files for 
+processing. The input data will be either positive or negative mode. 
+They cannot be mixed up.
 
 
 .. _ProteoWizard: http://proteowizard.sourceforge.net/

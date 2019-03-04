@@ -11,6 +11,10 @@
 #' wl-01-03-2019, Fri: tidy up for outline/tree view in vim and reformat
 #'   with R package 'styler'. Remove input file extension checking so it
 #'   supports both mzXML and mzML.
+#' wl-04-03-2019, Mon: add mz file directory option. It is not for Galaxy
+#'   since it is impossible to load data in a specific directiory of Galaxy
+#'   sever. This option is only for direct use of R script, either in 
+#'   interactive or command line mode. See shell script in './test'
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -77,7 +81,7 @@ if (com_f) {
       #' input
       make_option("--mzxml_file",
         type = "character",
-        help = "DIMS mzXML files list, seperated by comma"
+        help = "DIMS mzXML or mzML files list, seperated by comma"
       ),
       make_option("--targ_file",
         type = "character",
@@ -141,16 +145,21 @@ if (com_f) {
   tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
   opt <- list(
     #' input
-    #' mzxml_file = paste(paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
-    #'   paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
-    #'   sep = ","
-    #' ),
-    mzxml_file = paste(paste0(tool_dir, "test-data/01_sample.mzML"),
-                       paste0(tool_dir, "test-data/02_sample.mzML"),
-                       paste0(tool_dir, "test-data/03_sample.mzML"),
-                       paste0(tool_dir, "test-data/04_sample.mzML"),
-                       sep = ","
-                       ),
+
+    ## mzxml_file = paste(paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
+    ##                    paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
+    ##                    sep = ","
+    ##                    ),
+
+    ## mzxml_file = paste(paste0(tool_dir, "test-data/01_sample.mzML"),
+    ##                    paste0(tool_dir, "test-data/02_sample.mzML"),
+    ##                    paste0(tool_dir, "test-data/03_sample.mzML"),
+    ##                    paste0(tool_dir, "test-data/04_sample.mzML"),
+    ##                    sep = ","
+    ##                    ),
+    
+    mzxml_file = paste(paste0(tool_dir, "test-data")),
+
     targ_file = paste0(tool_dir, "LipidList_generator/Positive_LipidList.tsv"),
     samp_name = "",
     rt_low = 20.0,
@@ -174,13 +183,14 @@ suppressPackageStartupMessages({
 ## ==== Main process ====
 
 #' process multiple input files seperated by comma
-opt$mzxml_file <- str_vec(opt$mzxml_file)
-
-#' wl-01-03-2019, Fri: No need any more. Use cheetah in Galaxy XML to link 
-#' ether mzXML or mzML.
-#' if (!all(grepl("\\.mzXML", opt$mzxml_file))) { #' for Galaxy only
-#'   opt$mzxml_file <- paste0(opt$mzxml_file, ".mzXML")
-#' }
+#' wl-04-03-2019, Mon: add file directory option. Note that it is not for
+#' galaxy.
+if (dir.exists(opt$mzxml_file)) {   ## file directory
+  opt$mzxml_file <- list.files(opt$mzxml_file, pattern = "mzml|mzxml", 
+                               ignore.case = T, recursive = F, full.names = TRUE)
+} else {  ## multiple files
+  opt$mzxml_file <- str_vec(opt$mzxml_file)
+} 
 
 targets <- read.table(opt$targ_file, header = T, sep = "\t", stringsAsFactors = F)
 targets <- data.table(targets)
@@ -215,10 +225,10 @@ if (T) {
 #' --------------------------------------------------------------------
 #' Output results
 #' get signals (intensity) and mz deviations
-tmp <- targets[, c("name", "mz")]
-signals <- sapply(res, function(x) return(x[, "signal"]))
+tmp        <- targets[, c("name", "mz")]
+signals    <- sapply(res, function(x) return(x[, "signal"]))
 deviations <- sapply(res, function(x) return(x[, "mz_deviation"]))
-signals <- as.data.frame(cbind(tmp, signals))
+signals    <- as.data.frame(cbind(tmp, signals))
 deviations <- as.data.frame(cbind(tmp, deviations))
 
 #' save peak table
