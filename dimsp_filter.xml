@@ -225,8 +225,8 @@ wl-30-11-2018, Fri: add some help information
   <!-- =============================================================== -->
   <tests>
     <test>
-      <param name="peak_file" value="peak.tsv" />
-      <param name="grp_file" value="grp.tsv" />
+      <param name="peak_file" value="pos_peak.tsv" />
+      <param name="grp_file" value="grp_sam_qc_bl.tsv" />
       <param name="mv" value="TRUE" /> 
       <param name="merge" value="TRUE" /> 
       <output name="filter_file" file="peak_filter.tsv" />
