@@ -1,13 +1,19 @@
 <!--
 wl-29-11-2018, Thu: commence
 wl-30-11-2018, Fri: add some help information
+wl-18-03-2019, Mon: add macro and test
 --> 
 
 <tool id="dimsp_filter" name="dims_filtering" version="0.1.0">
   <description>
     Direct-infusion mass spectrometry lipidomics peak filtering
   </description>
-  
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  <expand macro="requirements" />
+  <expand macro="stdio" />
+
   <!-- =============================================================== -->
   <command>
     <![CDATA[
@@ -229,11 +235,21 @@ wl-30-11-2018, Fri: add some help information
       <param name="grp_file" value="grp_sam_qc_bl.tsv" />
       <param name="mv" value="TRUE" /> 
       <param name="merge" value="TRUE" /> 
-      <output name="filter_file" file="peak_filter.tsv" />
-      <output name="pdf_file" file="hist_box.pdf" />
+      <!-- <output name="filter_file" file="peak_filter.tsv" compare="diff"/> -->
+      <output name="pdf_file" file="hist_box.pdf"/>
+    </test>
+    <test>
+      <param name="peak_file" value="pos_peak.tsv" />
+      <param name="grp_file_sel" value="no" />
+      <param name="groups" value="Sample,sample, samplE, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank" />
+      <param name="qc_rsd_thres" value="60" />
+      <param name="mv" value="TRUE" /> 
+      <param name="merge" value="false" /> 
+      <param name="mv_impute" value="mean" />
+      <!-- <output name="filter_file" file="peak_filter.tsv" compare="diff"/> -->
+      <output name="pdf_file" file="hist_box.pdf"/>
     </test>
   </tests>
-
 
   <!-- =============================================================== -->
 <help>
@@ -429,5 +445,6 @@ If too many peaks have been removed, user should consider to increase
 threshold or not to perform QC filtering at all.
 
 </help>
-
+  <citations>
+  </citations>
 </tool>
