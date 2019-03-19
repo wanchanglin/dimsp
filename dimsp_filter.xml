@@ -11,11 +11,11 @@ wl-18-03-2019, Mon: add macro and test
   <macros>
     <import>macros.xml</import>
   </macros>
-  <expand macro="requirements" />
+  <!-- <expand macro="requirements" /> -->
   <expand macro="stdio" />
 
   <!-- =============================================================== -->
-  <command>
+  <command detect_errors="exit_code">
     <![CDATA[
     
       Rscript ${__tool_directory__}/dimsp_filter.R

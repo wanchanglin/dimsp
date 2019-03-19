@@ -81,7 +81,7 @@ if (com_f) {
       #' input
       make_option("--mzxml_file",
         type = "character",
-        help = "DIMS mzXML or mzML files list, seperated by comma"
+        help = "mzXML/ mzML file directory or full file list seperated by comma"
       ),
       make_option("--targ_file",
         type = "character",
