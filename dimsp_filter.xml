@@ -11,7 +11,7 @@ wl-18-03-2019, Mon: add macro and test
   <macros>
     <import>macros.xml</import>
   </macros>
-  <!-- <expand macro="requirements" /> -->
+  <expand macro="requirements" />
   <expand macro="stdio" />
 
   <!-- =============================================================== -->
@@ -235,8 +235,8 @@ wl-18-03-2019, Mon: add macro and test
       <param name="grp_file" value="grp_sam_qc_bl.tsv" />
       <param name="mv" value="TRUE" /> 
       <param name="merge" value="TRUE" /> 
-      <!-- <output name="filter_file" file="peak_filter.tsv" compare="diff"/> -->
-      <output name="pdf_file" file="hist_box.pdf"/>
+      <output name="filter_file" file="res_dimsp_filter/sam_qc_bl_peak_filter.tsv" compare="diff"/>
+      <output name="pdf_file" file="res_dimsp_filter/sam_qc_bl_hist_box.pdf" compare="sim_size"/>
     </test>
     <test>
       <param name="peak_file" value="pos_peak.tsv" />
@@ -244,10 +244,10 @@ wl-18-03-2019, Mon: add macro and test
       <param name="groups" value="Sample,sample, samplE, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank" />
       <param name="qc_rsd_thres" value="60" />
       <param name="mv" value="TRUE" /> 
-      <param name="merge" value="false" /> 
+      <param name="merge" value="TRUE" /> 
       <param name="mv_impute" value="mean" />
-      <!-- <output name="filter_file" file="peak_filter.tsv" compare="diff"/> -->
-      <output name="pdf_file" file="hist_box.pdf"/>
+      <output name="filter_file" file="res_dimsp_filter/sam_qc_bl_peak_filter.tsv" compare="diff"/>
+      <output name="pdf_file" file="res_dimsp_filter/sam_qc_bl_hist_box.pdf" compare="sim_size"/>
     </test>
   </tests>
 

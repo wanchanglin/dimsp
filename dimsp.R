@@ -15,7 +15,8 @@
 #'   since it is impossible to load data in a specific directiory of Galaxy
 #'   sever. This option is only for direct use of R script, either in 
 #'   interactive or command line mode. See shell script in './test'
-
+#' wl-20-03-2019, Wed: change structure of 'test-data' and put results into
+#'   this directory for Galaxy planemo test.
 ## ==== General settings ====
 rm(list = ls(all = T))
 
@@ -146,21 +147,21 @@ if (com_f) {
   opt <- list(
     #' input
 
-    ## mzxml_file = paste(paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_001.mzXML"),
-    ##                    paste0(tool_dir, "test-data/DIMS_pos/030317_mouse_liver_cs16_pos_002.mzXML"),
+    ## mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_001.mzXML"),
+    ##                    paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
     ##                    sep = ","
     ##                    ),
 
-    ## mzxml_file = paste(paste0(tool_dir, "test-data/01_sample.mzML"),
-    ##                    paste0(tool_dir, "test-data/02_sample.mzML"),
-    ##                    paste0(tool_dir, "test-data/03_sample.mzML"),
-    ##                    paste0(tool_dir, "test-data/04_sample.mzML"),
+    ## mzxml_file = paste(paste0(tool_dir, "test-data/mzML/01_sample.mzML"),
+    ##                    paste0(tool_dir, "test-data/mzML/02_sample.mzML"),
+    ##                    paste0(tool_dir, "test-data/mzML/03_sample.mzML"),
+    ##                    paste0(tool_dir, "test-data/mzML/04_sample.mzML"),
     ##                    sep = ","
     ##                    ),
     
     mzxml_file = paste(paste0(tool_dir, "test-data")),
 
-    targ_file = paste0(tool_dir, "LipidList_generator/Positive_LipidList.tsv"),
+    targ_file = paste0(tool_dir, "test-data/LipidList_generator/Positive_LipidList.tsv"),
     samp_name = "",
     rt_low = 20.0,
     rt_high = 60.0,
@@ -168,11 +169,11 @@ if (com_f) {
     mz_high = 1200.0,
     hwidth = 0.01,
     #' Output
-    sign_file = paste0(tool_dir, "res/signals.tsv"),
+    sign_file = paste0(tool_dir, "test-data/res_dimsp/signals.tsv"),
     devi = TRUE,
-    devi_file = paste0(tool_dir, "res/deviations.tsv"),
+    devi_file = paste0(tool_dir, "test-data/res_dimsp/deviations.tsv"),
     indi = TRUE,
-    indi_file = paste0(tool_dir, "res/individuals.xlsx")
+    indi_file = paste0(tool_dir, "test-data/res_dimsp/individuals.xlsx")
   )
 }
 

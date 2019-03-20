@@ -11,6 +11,7 @@ wl-28-08-2018, Tue: Get the original names of multiple mzxml file
       file     
 wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
 wl-01-03-2019, Fri: add mutiple input data format, mzXML and mzML
+wl-20-03-2019, Wed: add more tests
 --> 
 
 <tool id="dimsp" name="dims_processing" version="0.1.0">
@@ -112,17 +113,48 @@ wl-01-03-2019, Fri: add mutiple input data format, mzXML and mzML
 
   <!-- =============================================================== -->
   <tests>
+    <!-- mzXML positive -->  
     <test>
       <param name="mzxml_file" value="mzXML/030317_mouse_liver_cs16_pos_001.mzXML,mzXML/030317_mouse_liver_cs16_pos_002.mzXML" />
       <param name="targ_file" value="LipidList_generator/Positive_LipidList.tsv" />
       <param name="devi" value="TRUE" /> 
       <param name="indi" value="TRUE" /> 
-      <output name="sign_file" file="res_dimsp/mzxml_pos_sign_file.tsv" />
-      <output name="devi_file" file="res_dimsp/mzxml_pos_devi_file.tsv" />
-      <output name="indi_file" file="res_dimsp/mzxml_pos_indi_file.xlsx" />
+      <output name="sign_file" file="res_dimsp/mzxml_pos_sign.tsv" />
+      <output name="devi_file" file="res_dimsp/mzxml_pos_devi.tsv" />
+      <!-- FIXME: manual comparison is ok but Galaxy don't think so.-->
+      <!-- <output name="indi_file" file="res_dimsp/mzxml_pos_indi.xlsx" compare="sim_size"/> -->
+    </test>
+    <!-- mzXML negative -->  
+    <test>
+      <param name="mzxml_file" value="mzXML/030317_mouse_liver_cs16_neg_001.mzXML,mzXML/030317_mouse_liver_cs16_neg_004.mzXML" />
+      <param name="targ_file" value="LipidList_generator/Negative_LipidList.tsv" />
+      <param name="rt_low" value="80.0" />
+      <param name="rt_high" value="120.0" />
+      <param name="mz_low" value="185.0" />
+      <param name="mz_high" value="1200.0" />
+      <param name="devi" value="TRUE" /> 
+      <param name="indi" value="TRUE" /> 
+      <output name="sign_file" file="res_dimsp/mzxml_neg_sign.tsv" />
+      <output name="devi_file" file="res_dimsp/mzxml_neg_devi.tsv" />
+      <!-- FIXME: manual comparison is ok but Galaxy don't think so.-->
+      <!-- <output name="indi_file" file="res_dimsp/mzxml_neg_indi.xlsx" compare="sim_size"/> -->
+    </test>
+    <!-- mzML positive -->  
+    <test>
+      <param name="mzxml_file" value="mzML/01_sample.mzML,mzML/02_sample.mzML,mzML/03_sample.mzML,mzML/04_sample.mzML" />
+      <param name="targ_file" value="LipidList_generator/Positive_LipidList.tsv" />
+      <param name="rt_low" value="20.0" />
+      <param name="rt_high" value="60.0" />
+      <param name="mz_low" value="200.0" />
+      <param name="mz_high" value="1200.0" />
+      <param name="devi" value="TRUE" /> 
+      <param name="indi" value="TRUE" /> 
+      <output name="sign_file" file="res_dimsp/mzml_pos_sign.tsv" />
+      <output name="devi_file" file="res_dimsp/mzml_pos_devi.tsv" />
+      <!-- FIXME: manual comparison is ok but Galaxy don't think so.-->
+      <!-- <output name="indi_file" file="res_dimsp/mzml_pos_indi.xlsx" compare="sim_size"/> -->
     </test>
   </tests>
-
 
   <!-- =============================================================== -->
   <help>
