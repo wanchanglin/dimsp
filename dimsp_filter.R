@@ -163,7 +163,7 @@ if (com_f) {
 
       #' MV imputation
       make_option("--mv_impute",
-        type = "character", default = "mean",
+        type = "character", default = "knn",
         help = "MV imputation method. Currently support mean, median, min, knn and pca."
       ),
 

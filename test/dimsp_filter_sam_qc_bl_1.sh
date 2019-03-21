@@ -1,4 +1,4 @@
-# wl-08-08-2018, Tue: Rscript test code for Linux. 
+# wl-21-03-2019, Thu: Rscript test code for input group. 
 
 Rscript --vanilla ../dimsp_filter.R \
   --peak_file "../test-data/pos_peak.tsv" \
@@ -8,5 +8,5 @@ Rscript --vanilla ../dimsp_filter.R \
   --mv T \
   --merge F \
   --mv_impute "mean" \
-  --pdf_file "../test-data/res_dimsp_filter/hist_box.pdf"\
-  --filter_file "../testdata/res_dimsp_filter/peak_filter.tsv"\
+  --pdf_file "../test-data/res_dimsp_filter/sam_qc_bl_hist_box_1.pdf"\
+  --filter_file "../test-data/res_dimsp_filter/sam_qc_bl_peak_filter_1.tsv"\

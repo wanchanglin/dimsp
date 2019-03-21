@@ -140,7 +140,7 @@ if (com_f) {
     object = OptionParser(option_list = option_list),
     args = commandArgs(trailingOnly = TRUE)
   )
-  #' print(opt)
+  print(opt)
 } else {
   #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
   tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
