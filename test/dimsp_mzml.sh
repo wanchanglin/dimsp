@@ -8,8 +8,8 @@ Rscript --vanilla ../dimsp.R \
   --mz_low 200.0 \
   --mz_high 1200.0 \
   --hwidth 0.01 \
-  --sign_file "../test-data/res_dimsp/mzml_pos_sign.tsv" \
   --devi TRUE \
-  --devi_file "../test-data/res_dimsp/mzml_pos_devi.tsv"\
   --indi TRUE \
+  --sign_file "../test-data/res_dimsp/mzml_pos_sign.tsv" \
+  --devi_file "../test-data/res_dimsp/mzml_pos_devi.tsv"\
   --indi_file "../test-data/res_dimsp/mzml_pos_indi.xlsx"\

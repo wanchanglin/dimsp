@@ -17,6 +17,9 @@
 #'   interactive or command line mode. See shell script in './test'
 #' wl-20-03-2019, Wed: change structure of 'test-data' and put results into
 #'   this directory for Galaxy planemo test.
+#' wl-22-03-2019, Fri: change xls R package from 'WriteXLS' to 'writexl'.
+#'   The former gives different file size which leads to planemo test to fail
+#'   on xlsx files. The reason may be package version.
 ## ==== General settings ====
 rm(list = ls(all = T))
 
@@ -38,7 +41,8 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  library(WriteXLS)
+  #' library(WriteXLS)
+  library(writexl)
   library(xcms)
   library(data.table)
 })
@@ -147,10 +151,9 @@ if (com_f) {
   opt <- list(
     #' input
 
-    ## mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_001.mzXML"),
-    ##                    paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
-    ##                    sep = ","
-    ##                    ),
+    mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
+                       paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
+                       sep = ","),
 
     ## mzxml_file = paste(paste0(tool_dir, "test-data/mzML/01_sample.mzML"),
     ##                    paste0(tool_dir, "test-data/mzML/02_sample.mzML"),
@@ -159,9 +162,10 @@ if (com_f) {
     ##                    sep = ","
     ##                    ),
     
-    mzxml_file = paste(paste0(tool_dir, "test-data")),
+    #' mzxml_file = paste(paste0(tool_dir, "test-data")),
 
     targ_file = paste0(tool_dir, "test-data/LipidList_generator/Positive_LipidList.tsv"),
+    #' samp_name = "mzXML/030317_mouse_liver_cs16_pos_001.mzXML,mzXML/030317_mouse_liver_cs16_pos_002.mzXML",
     samp_name = "",
     rt_low = 20.0,
     rt_high = 60.0,
@@ -240,8 +244,10 @@ if (opt$devi) {
 }
 #' #' save each sample result
 if (opt$indi) {
-  WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
+  write_xlsx(res, path = opt$indi_file, col_names = T, format_headers = T)
+  #' WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
 }
+
 #' cat("\ngoes here\n")
 #' lapply(res, dim)
 

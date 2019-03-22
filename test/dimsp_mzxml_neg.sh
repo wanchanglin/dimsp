@@ -7,8 +7,8 @@ Rscript --vanilla ../dimsp.R \
   --rt_high 120.0 \
   --mz_low 185.0 \
   --mz_high 1200.0 \
-  --sign_file "../test-data/res_dimsp/mzxml_neg_sign.tsv" \
   --devi TRUE \
-  --devi_file "../test-data/res_dimsp/mzxml_neg_devi.tsv"\
   --indi TRUE \
+  --sign_file "../test-data/res_dimsp/mzxml_neg_sign.tsv" \
+  --devi_file "../test-data/res_dimsp/mzxml_neg_devi.tsv"\
   --indi_file "../test-data/res_dimsp/mzxml_neg_indi.xlsx"\
