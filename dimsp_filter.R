@@ -44,7 +44,8 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  library(WriteXLS)
+  library(writexl)
+  #' library(WriteXLS)
 })
 
 #' wl-28-08-2018, Tue: Convert a string separated by comma into character vector
