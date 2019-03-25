@@ -4,7 +4,7 @@
       <requirement type="package">r-optparse</requirement>
       <requirement type="package">r-reshape</requirement>
       <requirement type="package">r-lattice</requirement>
-      <requirement type="package">r-writexl</requirement>
+      <requirement type="package" version="4.1.0">r-writexls</requirement>
       <requirement type="package">r-data.table</requirement>
       <requirement type="package">bioconductor-xcms</requirement>
       <requirement type="package">bioconductor-impute</requirement>

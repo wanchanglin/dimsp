@@ -20,6 +20,9 @@
 #' wl-22-03-2019, Fri: change xls R package from 'WriteXLS' to 'writexl'.
 #'   The former gives different file size which leads to planemo test to fail
 #'   on xlsx files. The reason may be package version.
+#' wl-25-03-2019, Mon: bring back 'WriteXLS' since 'writexl' does not
+#'   support data frame's row names
+
 ## ==== General settings ====
 rm(list = ls(all = T))
 
@@ -41,8 +44,8 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  #' library(WriteXLS)
-  library(writexl)
+  library(WriteXLS)
+  #' library(writexl)
   library(xcms)
   library(data.table)
 })
@@ -244,8 +247,8 @@ if (opt$devi) {
 }
 #' #' save each sample result
 if (opt$indi) {
-  write_xlsx(res, path = opt$indi_file, col_names = T, format_headers = T)
-  #' WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
+  #' write_xlsx(res, path = opt$indi_file, col_names = T, format_headers = T)
+  WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
 }
 
 #' cat("\ngoes here\n")
