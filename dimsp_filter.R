@@ -22,6 +22,8 @@
 #'  - grp_file_sel: change from boolean to character purely for galaxy
 #' wl-01-03-2019, Fri: tidy up for outline/tree view in vim and reformat
 #'   with R package 'styler'
+#' wl-28-03-2019, Thu: make sure mv filtering must be performed once on
+#'  **sample**
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -182,47 +184,50 @@ if (com_f) {
     object = OptionParser(option_list = option_list),
     args = commandArgs(trailingOnly = TRUE)
   )
-  #' print(opt)
 } else {
-  #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
-  tool_dir <- "~/my_galaxy/dimsp/" #' for linux. Must be case-sensitive
+  tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
+  #' tool_dir <- "~/my_galaxy/dimsp/" #' for linux. Must be case-sensitive
   opt <- list(
     #' Input
-    peak_file = paste0(tool_dir, "res/pos_peak.tsv"),
+    peak_file = paste0(tool_dir, "test-data/pos_peak.tsv"),
     #' input group information directly or load a file?
     grp_file_sel = "yes",
-    grp_file = paste0(tool_dir, "res/grp_sam_qc_bl.tsv"),
-    groups = "sample, sample, sample, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
+    grp_file = paste0(tool_dir, "test-data/grp_sam.tsv"),
+    #' grp_file = paste0(tool_dir, "test-data/grp_sam_bl.tsv"),
+    #' grp_file = paste0(tool_dir, "test-data/grp_sam_qc.tsv"),
+    #' grp_file = paste0(tool_dir, "test-data/grp_sam_qc_bl.tsv"),
+    #' groups = "sample, sample, sample, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
 
     #' QC filtering
     qc = TRUE,
     qc_rsd_thres = 60.0,
     qc_mv_filter = TRUE,
-    qc_mv_qc_sam = FALSE,
+    qc_mv_qc_sam = TRUE,
     qc_mv_thres = 0.30,
 
     #' blank filtering
     bl = TRUE,
     bl_method = "mean",
     bl_factor = 1,
-    bl_mv_filter = TRUE,
+    bl_mv_filter = FALSE,
     bl_mv_thres = 0.30,
 
     #' MV filtering on samples
-    mv = TRUE,
+    mv = FALSE,
     mv_thres = 0.30,
 
     #' Merge data (sample, qc and blank)
-    merge = TRUE,
+    merge = FALSE,
 
     #' MV imputation
     mv_impute = "mean",
 
     #' output
-    pdf_file = paste0(tool_dir, "res/hist_box.pdf"),
-    filter_file = paste0(tool_dir, "res/peak_filter.tsv")
+    pdf_file = paste0(tool_dir, "test-data/res_dimsp_filter/hist_box_deb.pdf"),
+    filter_file = paste0(tool_dir, "test-data/res_dimsp_filter/peak_filter_deb.tsv")
   )
 }
+print(opt)
 
 suppressPackageStartupMessages({
   source(paste0(tool_dir, "fs_filter.R"))
@@ -338,24 +343,31 @@ if (opt$bl) {
   }
 }
 
+#' wl-28-11-2018, Wed: MV filtering can be done in qc_filter,
+#'  blank_filter or mv_filter. Note that mv filtering on sample must be
+#'  performed once. Otherwise even mv imputation does not work for large
+#'  portion of missing values in some variables.
+
+#' wl-28-03-2019, Thu: make sure mv filtering must be performed once on
+#'  **sample**
+(mv_qc <- ("qc" %in% levels(groups)) && (opt$qc_mv_filter) && !(opt$qc_mv_qc_sam))
+(mv_bl <- ("blank" %in% levels(groups)) && (opt$bl_mv_filter))
+(mv <- opt$mv || !(mv_qc || mv_bl))
+
 #' mv filtering
-if (opt$mv) {
+if (mv) {
   data <- mv_filter(data, thres_mv = opt$mv_thres)
   cat("data dimension after mv filtering:\n")
   sapply(data, dim)
 }
 
-#' wl-28-11-2018, Wed: MV filtering can be done in qc_filter,
-#' blank_filter or mv_filter. Note that mv filtering on sample must be
-#' performed once. Otherwise even mv imputation does not work for large
-#' portion of missing values in some variables.
 
 ## ==== 4) Merge data set ====
 #' want to merge sample, qc and blank?
 if (opt$merge) {
-  dat <- do.call(rbind, data)
+  mat <- do.call(rbind, data)
 } else {
-  dat <- data$sample
+  mat <- data$sample
 }
 
 ## ==== 5) Missing value imputation ====
@@ -363,12 +375,12 @@ if (opt$merge) {
 #'   multivariate. 'mean', 'median' and 'min' belongs to the former while
 #'   'knn' and 'pca' the later.
 
-dat <- mv.impute(dat, method = opt$mv_impute)
+mat <- mv.impute(mat, method = opt$mv_impute)
 
 ## ==== 6) Tidy up and output ====
 
 #' transpose back
-dat <- as.data.frame(t(dat))
+mat <- as.data.frame(t(mat))
 
 #' get the replicate names
 col_name <- lapply(levels(groups), function(x) {
@@ -382,14 +394,14 @@ if (opt$merge) {
 } else {
   col_name <- col_name$sample
 }
-names(dat) <- col_name
+names(mat) <- col_name
 
 #' get annotation and mz values
-row_ind <- rownames(dat)
+row_ind <- rownames(mat)
 row_ind <- gsub("[^\\d]", "", row_ind, perl = T)
 
 #' Combine annotation, mz and peaks
-peak_filter <- cbind(peak[row_ind, 1:2], dat)
+peak_filter <- cbind(peak[row_ind, 1:2], mat)
 
 #' save peak table
 write.table(peak_filter, file = opt$filter_file, sep = "\t", row.names = F)
