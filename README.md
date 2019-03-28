@@ -8,11 +8,13 @@ For details how to get annotation and peak table, see
 
 ## Installation ##
 
-You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
-[R](https://cran.r-project.org/) under Linux. 
+- Install [Galaxy](https://github.com/galaxyproject/galaxy) under Linux.
 
-- Install R packages `optparse`, `WriteXLS`, `xcms`, `data.table`,
-  `reshape`, `lattice`, `impute` and `pcaMethods` inside R. 
+- Install [conda](https://docs.conda.io/en/latest/miniconda.html) under
+  Linux. `conda` is used to install `requirements` of this tool, i.e. R
+  packages used: `optparse`, `WriteXLS`, `xcms`, `data.table`,
+  `reshape`, `lattice`, `impute` and `pcaMethods`. 
+
 - Use `git` to clone this tool
 
   ```bash
@@ -39,16 +41,10 @@ You need to install [Galaxy](https://github.com/galaxyproject/galaxy) and
   </toolbox>
   ```
 
-- Test data:
-  - mzXML files are located in `test-data`.
-  - Lipid lists in TSV(Tab Separated Values) format are in directory 
-    `LipidList_generator`. 
-  - `dimsp_filter` test files in TSV format are also in `test-data`.
-
-## To-Do ##
-
-- Dependencies will be handled by CONDA. This includes all R packages used.
-- Any other issues
+- Test data are in `test-data`, includes:
+  - mzXML and mzML files for DIMSP processing.
+  - Lipid lists in TSV(Tab Separated Values) format. 
+  - TSV files for DIMSP filtering.
 
 ## Authors, contributors & contacts ##
 
