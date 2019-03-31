@@ -6,7 +6,7 @@ Rscript --vanilla ../dimsp_filter.R \
   --grp_file  "../test-data/grp_sam_bl.tsv" \
   --qc F \
   --bl T \
-  --mv T \
+  --mv F \
   --merge F \
   --pdf_file "../test-data/res_dimsp_filter/sam_bl_hist_box.pdf"\
   --filter_file "../test-data/res_dimsp_filter/sam_bl_peak_filter.tsv"\

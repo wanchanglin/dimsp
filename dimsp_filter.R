@@ -350,8 +350,8 @@ if (opt$bl) {
 
 #' wl-28-03-2019, Thu: make sure mv filtering must be performed once on
 #'  **sample**
-(mv_qc <- ("qc" %in% levels(groups)) && (opt$qc_mv_filter) && !(opt$qc_mv_qc_sam))
-(mv_bl <- ("blank" %in% levels(groups)) && (opt$bl_mv_filter))
+(mv_qc <- (opt$qc) && ("qc" %in% levels(groups)) && (opt$qc_mv_filter) && !(opt$qc_mv_qc_sam))
+(mv_bl <- (opt$bl) && ("blank" %in% levels(groups)) && (opt$bl_mv_filter))
 (mv <- opt$mv || !(mv_qc || mv_bl))
 
 #' mv filtering
