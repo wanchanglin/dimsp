@@ -7,6 +7,6 @@ Rscript --vanilla ../dimsp_filter.R \
   --qc F \
   --bl F \
   --mv F \
-  --merge F \
+  --merge T \
   --pdf_file "../test-data/res_dimsp_filter/sam_hist_box.pdf"\
   --filter_file "../test-data/res_dimsp_filter/sam_peak_filter.tsv"\

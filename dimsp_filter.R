@@ -24,6 +24,7 @@
 #'   with R package 'styler'
 #' wl-28-03-2019, Thu: make sure mv filtering must be performed once on
 #'  **sample**
+#' wl-01-04-2019, Mon: debug rsd threshold again.
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -110,7 +111,9 @@ if (com_f) {
       ),
       make_option("--qc_rsd_thres",
         type = "double", default = 20.0,
-        help = "RSD threshold for QC filtering."
+        help = "RSD threshold for QC filtering. Features less than the
+                threshold will be kept."
+
       ),
       make_option("--qc_mv_filter",
         type = "logical", default = TRUE,
@@ -122,7 +125,8 @@ if (com_f) {
       ),
       make_option("--qc_mv_thres",
         type = "double", default = 0.30,
-        help = "MV percentage threshold for mv filtering inside qc filtering"
+        help = "MV percentage threshold for mv filtering inside qc filtering.
+                Features less than the threshold will be kept."
       ),
 
       #' Blank filtering
@@ -144,7 +148,8 @@ if (com_f) {
       ),
       make_option("--bl_mv_thres",
         type = "double", default = 0.30,
-        help = "MV percentage threshold for mv filtering inside blank filtering"
+        help = "MV percentage threshold for mv filtering inside blank filtering.
+                Features less than the threshold will be kept."
       ),
 
       #' MV filtering
@@ -154,7 +159,8 @@ if (com_f) {
       ),
       make_option("--mv_thres",
         type = "double", default = 0.30,
-        help = "MV percentage threshold for mv filtering"
+        help = "MV percentage threshold for mv filtering.
+                Features less than the threshold will be kept."
       ),
 
       #' Merge data (sample, qc and blank)
@@ -185,22 +191,24 @@ if (com_f) {
     args = commandArgs(trailingOnly = TRUE)
   )
 } else {
-  tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
-  #' tool_dir <- "~/my_galaxy/dimsp/" #' for linux. Must be case-sensitive
+  #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
+  tool_dir <- "~/my_galaxy/dimsp/" #' for linux. Must be case-sensitive
   opt <- list(
     #' Input
     peak_file = paste0(tool_dir, "test-data/pos_peak.tsv"),
     #' input group information directly or load a file?
     grp_file_sel = "yes",
-    grp_file = paste0(tool_dir, "test-data/grp_sam.tsv"),
+    grp_file = paste0(tool_dir, "test-data/grp_sam_qc.tsv"),
+    #' grp_file = paste0(tool_dir, "test-data/grp_sam.tsv"),
     #' grp_file = paste0(tool_dir, "test-data/grp_sam_bl.tsv"),
-    #' grp_file = paste0(tool_dir, "test-data/grp_sam_qc.tsv"),
     #' grp_file = paste0(tool_dir, "test-data/grp_sam_qc_bl.tsv"),
     #' groups = "sample, sample, sample, sample, sample, sample, sample, sample, sample, sample, qc, qc, blank, blank",
 
     #' QC filtering
     qc = TRUE,
-    qc_rsd_thres = 60.0,
+    #' wl-01-04-2019, Mon: It is critical to choose rsd threshold. The
+    #' distribution of rsd could be a guidian. 
+    qc_rsd_thres = 60.0, 
     qc_mv_filter = TRUE,
     qc_mv_qc_sam = TRUE,
     qc_mv_thres = 0.30,

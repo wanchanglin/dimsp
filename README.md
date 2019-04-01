@@ -1,4 +1,4 @@
-# dimsp for Galaxy #
+# DIMSP for Galaxy #
 
 Galaxy tool for Direct-Infusion Mass Spectrometry (DIMS) based lipidomics
 data processing and filtering.

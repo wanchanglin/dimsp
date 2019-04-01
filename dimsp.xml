@@ -15,7 +15,7 @@
   wl-22-03-2019, Fri: figure out why planemo test fails in xlsx files. 
   Although the contents are the same the file sizes are different. even use 
   the same version of 'WriteXLS'. The planemo always produces a big xlsx
-  file.  have to comment out the xlsx file in 'test'.
+  file. Have to comment out the xlsx file in 'test'.
 --> 
 
 <tool id="dimsp" name="dims_processing" version="0.1.0">
