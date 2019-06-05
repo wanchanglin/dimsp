@@ -218,7 +218,7 @@ if (T) {
 
   #' handle sample names
   if (opt$samp_name == "") {
-    opt$samp_name <- opt$mzxml
+    opt$samp_name <- opt$mzxml_file
   } else {
     opt$samp_name <- str_vec(opt$samp_name)
   }

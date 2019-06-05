@@ -25,16 +25,16 @@
   <macros>
     <import>macros.xml</import>
   </macros>
-  <expand macro="stdio" />
   <expand macro="requirements" />
+  <expand macro="stdio" />
   <!-- =============================================================== -->
   <command detect_errors="exit_code">
     <![CDATA[
       #for $file in $mzxml_file:
         #if $file.is_of_type("mzxml")
-          ln -s ${file} ${file}.mzXML &&
+          ln -sf ${file} ${file}.mzXML &&
         #else
-          ln -s ${file} ${file}.mzML &&
+          ln -sf ${file} ${file}.mzML &&
         #end if  
       #end for
 
