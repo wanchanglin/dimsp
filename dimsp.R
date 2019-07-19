@@ -24,6 +24,10 @@
 #'   support data frame's row names
 #' wl-15-07-2019, Mon: use xcms to change ranges of time and m/z. Only for
 #' debug.
+#' wl-19-07-2019, Fri: there is no centroding for spectra. 'xcmsRaw' only
+#' loads data without peak detection(peak picking, peak finding). Note that
+#' 'xcmsSet' (here not using) performs peak detection via 'findPeaks'. Use
+#' 'ProteoWizards' for peak picking when converting data to mzML.
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -151,14 +155,14 @@ if (com_f) {
   )
   print(opt)
 } else {
-  #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
-  tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
+  tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
+  #' tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
   opt <- list(
     #' input
 
-    mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
-                       paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
-                       sep = ","),
+    #' mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
+    #'                    paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
+    #'                    sep = ","),
 
     ## mzxml_file = paste(paste0(tool_dir, "test-data/mzML/01_sample.mzML"),
     ##                    paste0(tool_dir, "test-data/mzML/02_sample.mzML"),
@@ -167,7 +171,7 @@ if (com_f) {
     ##                    sep = ","
     ##                    ),
     
-    #' mzxml_file = paste(paste0(tool_dir, "test-data")),
+    mzxml_file = paste(paste0(tool_dir, "test-data/mzXML")),
 
     targ_file = paste0(tool_dir, "test-data/LipidList_generator/Positive_LipidList.tsv"),
     #' samp_name = "mzXML/030317_mouse_liver_cs16_pos_001.mzXML,mzXML/030317_mouse_liver_cs16_pos_002.mzXML",
@@ -264,11 +268,11 @@ if (F) {
 
   #' file path of mzML files
   #' path <- "C:/R_lwc/dims_processing/test-data/"
-  path <- "./test-data/"
+  path <- "./test-data/mzML"
   files <- list.files(path, pattern = "mzML", recursive = F, full.names = TRUE)
   (files <- files[1:4])
 
-  targets <- read.table("./LipidList_generator/Positive_LipidList.tsv",
+  targets <- read.table("./test-data/LipidList_generator/Positive_LipidList.tsv",
     header = T, sep = "\t", stringsAsFactors = F
   )
   targets <- data.table(targets)
@@ -321,6 +325,10 @@ if (F) {
 if (F) { 
   xr <- xcmsRaw(files[1])
   xr
+
+  #' wl-19-07-2019, Fri: test
+  spec <- getSpec(xr, rtrange = c(20, 60), mzrange = c(200, 1200))
+  peak <- findPeaks(xr)    #' why only 10 peaks returned?
 
   #' ----------------------------------------
   #' look at the structure of the object
