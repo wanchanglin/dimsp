@@ -22,6 +22,12 @@
 #'   on xlsx files. The reason may be package version.
 #' wl-25-03-2019, Mon: bring back 'WriteXLS' since 'writexl' does not
 #'   support data frame's row names
+#' wl-15-07-2019, Mon: use xcms to change ranges of time and m/z. Only for
+#' debug.
+#' wl-19-07-2019, Fri: there is no centroding for spectra. 'xcmsRaw' only
+#' loads data without peak detection(peak picking, peak finding). Note that
+#' 'xcmsSet' (here not using) performs peak detection via 'findPeaks'. Use
+#' 'ProteoWizards' for peak picking when converting data to mzML.
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -149,14 +155,14 @@ if (com_f) {
   )
   print(opt)
 } else {
-  #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
-  tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
+  tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
+  #' tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
   opt <- list(
     #' input
 
-    mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
-                       paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
-                       sep = ","),
+    #' mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
+    #'                    paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
+    #'                    sep = ","),
 
     ## mzxml_file = paste(paste0(tool_dir, "test-data/mzML/01_sample.mzML"),
     ##                    paste0(tool_dir, "test-data/mzML/02_sample.mzML"),
@@ -165,7 +171,7 @@ if (com_f) {
     ##                    sep = ","
     ##                    ),
     
-    #' mzxml_file = paste(paste0(tool_dir, "test-data")),
+    mzxml_file = paste(paste0(tool_dir, "test-data/mzXML")),
 
     targ_file = paste0(tool_dir, "test-data/LipidList_generator/Positive_LipidList.tsv"),
     #' samp_name = "mzXML/030317_mouse_liver_cs16_pos_001.mzXML,mzXML/030317_mouse_liver_cs16_pos_002.mzXML",
@@ -262,11 +268,11 @@ if (F) {
 
   #' file path of mzML files
   #' path <- "C:/R_lwc/dims_processing/test-data/"
-  path <- "./test-data/"
+  path <- "./test-data/mzML"
   files <- list.files(path, pattern = "mzML", recursive = F, full.names = TRUE)
   (files <- files[1:4])
 
-  targets <- read.table("./LipidList_generator/Positive_LipidList.tsv",
+  targets <- read.table("./test-data/LipidList_generator/Positive_LipidList.tsv",
     header = T, sep = "\t", stringsAsFactors = F
   )
   targets <- data.table(targets)
@@ -315,48 +321,30 @@ if (F) {
   #' gc() # helps memory allocation errors on low memory systems
 }
 
-## ==== DEBUG: Temp codes ====
-if (F) { #' Use MSnbase package to read data.
-  #' ----------------------------------------------------------------
-  raw_data <- readMSData(files, mode = "onDisk")
-  raw_data
-  slotNames(raw_data)
-
-  #' --------------------
-  rt <- rtime(raw_data)
-  class(rt) #' numeric
-  length(rt) #' 2673 = 9 * 297
-
-  #' --------------------
-  mzs <- mz(raw_data)
-  #' Split the list by file
-  mzs_by_file <- split(mzs, f = fromFile(raw_data))
-  length(mzs_by_file) #' 9
-  length(mzs_by_file[[1]]) #' 297
-  length(mzs_by_file[[1]][[1]]) #' 13004
-
-  #' --------------------
-  inten <- intensity(raw_data)
-  inten_by_file <- split(inten, f = fromFile(raw_data))
-  length(inten_by_file) #' 9
-  length(inten_by_file[[1]]) #' 297
-  length(inten_by_file[[1]][[1]]) #' 13004
-}
-
 ## ==== DEBUG: Use xcms to load data ====
 if (F) { 
   xr <- xcmsRaw(files[1])
   xr
 
+  #' wl-19-07-2019, Fri: test
+  spec <- getSpec(xr, rtrange = c(20, 60), mzrange = c(200, 1200))
+  peak <- findPeaks(xr)    #' why only 10 peaks returned?
+
   #' ----------------------------------------
-  #' Lets have a look at the structure of the object
+  #' look at the structure of the object
   slotNames(xr)
   #' names(attributes(xr))
   #' str(xr)
 
+  #' scan time
   xr@scantime
+  range(xr@scantime)
+  summary(xr@scantime)
+
   xr@scanindex
   head(xr@scanindex)
+
+  #' m/z range
   xr@mzrange
 
   names(xr@env) #' profile, mz, intensity
@@ -395,3 +383,59 @@ if (F) {
   spec <- spec[, mean(intensity), by = mz]
   spec <- na.omit(spec)
 }
+## ==== DEBUG: Use xcms to check ranges of time and m/z ====
+if (F) { 
+  tmp <- sapply(files, function(x){ #' x <- files[1]              
+    obj <- xcmsRaw(x) 
+    #' slotNames(obj)
+    #' obj     
+    
+    #' wl-15-07-2019, Mon: from 'xcmsRaw' show method 
+
+    #' time range
+    time_range  <- round(range(obj@scantime),1)
+    #' summary(obj@scantime)
+
+    #' mass range
+    mass_range <- round(range(obj@env$mz), 4)
+
+   list(time_range=time_range, mass_rang=mass_range)
+  })
+  tmp <- t(tmp) 
+
+  #' wl-15-07-2019, Mon: should properly use lapply instead of sapply and
+  #' get scan time and m/z range individually. Here is dirt and quick.
+
+}
+
+## ==== DEBUG: Use MSnbase to load data ====
+if (F) { 
+  raw_data <- readMSData(files, mode = "onDisk")
+  raw_data
+  slotNames(raw_data)
+
+  #' --------------------
+  rt <- rtime(raw_data)
+  class(rt) #' numeric
+  length(rt) #' 2673 = 9 * 297
+
+  #' --------------------
+  mzs <- mz(raw_data)
+  #' Split the list by file
+  mzs_by_file <- split(mzs, f = fromFile(raw_data))
+  length(mzs_by_file)
+  length(mzs_by_file[[1]])
+  length(mzs_by_file[[1]][[1]])
+  summary(mzs_by_file[[1]][[1]])
+
+  #' --------------------
+  inten <- intensity(raw_data)
+  inten_by_file <- split(inten, f = fromFile(raw_data))
+  length(inten_by_file) #' 9
+  length(inten_by_file[[1]]) #' 297
+  length(inten_by_file[[1]][[1]]) #' 13004
+
+  #' wl-15-07-2019, Mon: it is inconvenient to check rnages of time and m/z.
+  #' use xcms instead.
+}
+
