@@ -201,6 +201,8 @@ mz          name
 225.186     FA(14:1)_[M-H]1-
 ========    ==========================================
 
+      |
+
 Note that the target matrix file should be either positive or negative,
 depending on the mode of DIMS data input. For the examples of positive 
 and negative mode, see https://github.com/wanchanglin/dimsp/tree/master/test-data/LipidList_generator.
@@ -247,6 +249,7 @@ DG_44:3_[M+NH4]1+                      748.6814  13201.64570   8790.560   0
 2H-IS_PE_[M+H]1+                       748.7244  113052.2131   0          81301.89354 
 ====================================== ========  ===========   ========   ==========   
 
+      |
 
 Deviations table
 ~~~~~~~~~~~~~~~~

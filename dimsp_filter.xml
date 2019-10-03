@@ -368,6 +368,7 @@ on intensity data and leave other data (such as 'name' and 'mz') unchanged.
 | MG_16:0_[M+NH4]1+    | 348.3108 |   7284.15 |  13460.34 | 22220.10 |  1939.08 |  4642.73 |  3129.56 |
 +----------------------+----------+-----------+-----------+----------+----------+----------+----------+
 
+|
 
 **\2. Group**
   
@@ -410,6 +411,8 @@ providing the group information:
   +--------+        
   | blank  |        
   +--------+        
+
+    |
 
   Note that this table does not includes any header.   
 
