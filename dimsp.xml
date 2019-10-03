@@ -124,21 +124,7 @@
       <param name="indi" value="TRUE" /> 
       <output name="sign_file" file="res_dimsp/mzxml_pos_sign.tsv" />
       <output name="devi_file" file="res_dimsp/mzxml_pos_devi.tsv" />
-      <!-- <output name="indi_file" file="res_dimsp/mzxml_pos_indi.xlsx" compare="sim_size"/> -->
-    </test>
-    <!-- mzXML negative -->  
-    <test>
-      <param name="mzxml_file" value="mzXML/030317_mouse_liver_cs16_neg_001.mzXML,mzXML/030317_mouse_liver_cs16_neg_004.mzXML" />
-      <param name="targ_file" value="LipidList_generator/Negative_LipidList.tsv" />
-      <param name="rt_low" value="80.0" />
-      <param name="rt_high" value="120.0" />
-      <param name="mz_low" value="185.0" />
-      <param name="mz_high" value="1200.0" />
-      <param name="devi" value="TRUE" /> 
-      <param name="indi" value="TRUE" /> 
-      <output name="sign_file" file="res_dimsp/mzxml_neg_sign.tsv" />
-      <output name="devi_file" file="res_dimsp/mzxml_neg_devi.tsv" />
-      <!-- <output name="indi_file" file="res_dimsp/mzxml_neg_indi.xlsx" compare="sim_size"/> -->
+      <!-- <output name="indi_file" file="res_dimsp/mzxml_pos_indi.xlsx" compare="sim_size" delta="10000"/> -->
     </test>
     <!-- mzML positive -->  
     <test>
@@ -152,7 +138,7 @@
       <param name="indi" value="TRUE" /> 
       <output name="sign_file" file="res_dimsp/mzml_pos_sign.tsv" />
       <output name="devi_file" file="res_dimsp/mzml_pos_devi.tsv" />
-      <!-- <output name="indi_file" file="res_dimsp/mzml_pos_indi.xlsx" compare="sim_size"/> -->
+      <!-- <output name="indi_file" file="res_dimsp/mzml_pos_indi.xlsx" compare="sim_size" delta="10000"/> -->
     </test>
   </tests>
 

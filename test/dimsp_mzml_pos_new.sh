@@ -1,0 +1,16 @@
+# wl-20-03-2019, Wed: mzML file test. (positive) 
+# wl03-10-2019, Thu: new rt and mz setting for a smaller data.
+
+Rscript --vanilla ../dimsp.R \
+  --mzxml_file "../test-data/mzML/01_sample.mzML, ../test-data/mzML/02_sample.mzML,../test-data/mzML/03_sample.mzML,../test-data/mzML/04_sample.mzML" \
+  --targ_file  "../test-data/LipidList_generator/Positive_LipidList.tsv" \
+  --rt_low 30.0 \
+  --rt_high 35.0 \
+  --mz_low 800.0 \
+  --mz_high 1000.0 \
+  --hwidth 0.01 \
+  --devi TRUE \
+  --indi TRUE \
+  --sign_file "../test-data/res_dimsp/mzml_pos_sign.tsv" \
+  --devi_file "../test-data/res_dimsp/mzml_pos_devi.tsv"\
+  --indi_file "../test-data/res_dimsp/mzml_pos_indi.xlsx"\
