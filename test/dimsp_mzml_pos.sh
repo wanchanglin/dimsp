@@ -17,6 +17,6 @@ Rscript --vanilla ../dimsp.R \
   --hwidth 0.01 \
   --devi TRUE \
   --indi TRUE \
-  --sign_file "../test-data/res_dimsp/mzml_pos_sign.tsv" \
-  --devi_file "../test-data/res_dimsp/mzml_pos_devi.tsv"\
-  --indi_file "../test-data/res_dimsp/mzml_pos_indi.xlsx"\
+  --sign_file "../test-data/res/mzml_pos_sign.tsv" \
+  --devi_file "../test-data/res/mzml_pos_devi.tsv"\
+  --indi_file "../test-data/res/mzml_pos_indi.xlsx"\

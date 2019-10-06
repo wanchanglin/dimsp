@@ -8,5 +8,5 @@ Rscript --vanilla ../dimsp_filter.R \
   --mv T \
   --merge F \
   --mv_impute "mean" \
-  --pdf_file "../test-data/res_dimsp_filter/sam_qc_bl_hist_box_1.pdf"\
-  --filter_file "../test-data/res_dimsp_filter/sam_qc_bl_peak_filter_1.tsv"\
+  --pdf_file "../test-data/res/sam_qc_bl_hist_box_1.pdf"\
+  --filter_file "../test-data/res/sam_qc_bl_peak_filter_1.tsv"\

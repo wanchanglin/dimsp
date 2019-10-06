@@ -243,8 +243,8 @@ wl-01-04-2019, Mon: add more test and all pass.
       <param name="bl" value="TRUE" /> 
       <param name="mv" value="FALSE" /> 
       <param name="merge" value="TRUE" /> 
-      <output name="filter_file" file="res_dimsp_filter/sam_qc_bl_peak_filter.tsv" compare="diff"/>
-      <output name="pdf_file" file="res_dimsp_filter/sam_qc_bl_hist_box.pdf" compare="sim_size"/>
+      <output name="filter_file" file="res/sam_qc_bl_peak_filter.tsv" compare="diff"/>
+      <output name="pdf_file" file="res/sam_qc_bl_hist_box.pdf" compare="sim_size"/>
     </test>
     <!-- test for sample, qc and blank with group. Case-insensitive -->
     <test>
@@ -255,8 +255,8 @@ wl-01-04-2019, Mon: add more test and all pass.
       <param name="mv" value="TRUE" /> 
       <param name="merge" value="false" /> 
       <param name="mv_impute" value="mean" />
-      <output name="filter_file" file="res_dimsp_filter/sam_qc_bl_peak_filter_1.tsv" compare="diff"/>
-      <output name="pdf_file" file="res_dimsp_filter/sam_qc_bl_hist_box_1.pdf" compare="sim_size"/>
+      <output name="filter_file" file="res/sam_qc_bl_peak_filter_1.tsv" compare="diff"/>
+      <output name="pdf_file" file="res/sam_qc_bl_hist_box_1.pdf" compare="sim_size"/>
     </test>
     <!-- test for sample and qc with group file -->
     <test>
@@ -269,8 +269,8 @@ wl-01-04-2019, Mon: add more test and all pass.
       <param name="bl" value="FLASE" /> 
       <param name="mv" value="FALSE" /> 
       <param name="merge" value="TRUE" /> 
-      <output name="filter_file" file="res_dimsp_filter/sam_qc_peak_filter.tsv" compare="diff"/>
-      <output name="pdf_file" file="res_dimsp_filter/sam_qc_hist_box.pdf" compare="sim_size"/>
+      <output name="filter_file" file="res/sam_qc_peak_filter.tsv" compare="diff"/>
+      <output name="pdf_file" file="res/sam_qc_hist_box.pdf" compare="sim_size"/>
     </test>
     <!-- test for sample and bl with group file -->
     <test>
@@ -281,8 +281,8 @@ wl-01-04-2019, Mon: add more test and all pass.
       <param name="bl" value="TRUE" /> 
       <param name="mv" value="FALSE" /> 
       <param name="merge" value="FLASE" /> 
-      <output name="filter_file" file="res_dimsp_filter/sam_bl_peak_filter.tsv" compare="diff"/>
-      <output name="pdf_file" file="res_dimsp_filter/sam_bl_hist_box.pdf" compare="sim_size"/>
+      <output name="filter_file" file="res/sam_bl_peak_filter.tsv" compare="diff"/>
+      <output name="pdf_file" file="res/sam_bl_hist_box.pdf" compare="sim_size"/>
     </test>
     <!-- test for sample only with group file. mv filtering will performed even 'mv' is F -->
     <test>
@@ -293,8 +293,8 @@ wl-01-04-2019, Mon: add more test and all pass.
       <param name="bl" value="FLASE" /> 
       <param name="mv" value="FALSE" /> 
       <param name="merge" value="TRUE" /> 
-      <output name="filter_file" file="res_dimsp_filter/sam_peak_filter.tsv" compare="diff"/>
-      <output name="pdf_file" file="res_dimsp_filter/sam_hist_box.pdf" compare="sim_size"/>
+      <output name="filter_file" file="res/sam_peak_filter.tsv" compare="diff"/>
+      <output name="pdf_file" file="res/sam_hist_box.pdf" compare="sim_size"/>
     </test>
   </tests>
 

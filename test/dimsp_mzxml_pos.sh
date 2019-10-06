@@ -10,6 +10,6 @@ Rscript --vanilla ../dimsp.R \
   --targ_file  "../test-data/LipidList_generator/Positive_LipidList.tsv" \
   --indi TRUE \
   --devi TRUE \
-  --sign_file "../test-data/res_dimsp/mzxml_pos_sign.tsv" \
-  --devi_file "../test-data/res_dimsp/mzxml_pos_devi.tsv" \
-  --indi_file "../test-data/res_dimsp/mzxml_pos_indi.xlsx" \
+  --sign_file "../test-data/res/mzxml_pos_sign.tsv" \
+  --devi_file "../test-data/res/mzxml_pos_devi.tsv" \
+  --indi_file "../test-data/res/mzxml_pos_indi.xlsx" \

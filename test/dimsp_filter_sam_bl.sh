@@ -8,5 +8,5 @@ Rscript --vanilla ../dimsp_filter.R \
   --bl T \
   --mv F \
   --merge F \
-  --pdf_file "../test-data/res_dimsp_filter/sam_bl_hist_box.pdf"\
-  --filter_file "../test-data/res_dimsp_filter/sam_bl_peak_filter.tsv"\
+  --pdf_file "../test-data/res/sam_bl_hist_box.pdf"\
+  --filter_file "../test-data/res/sam_bl_peak_filter.tsv"\
