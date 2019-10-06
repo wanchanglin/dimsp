@@ -1,4 +1,11 @@
 # wl-20-03-2019, Wed: mzML file test. (positive) 
+# wl-06-10-2019, Sun: use reduced data set done by Melanie Föll
+#  (melanie.foell@mol-med.uni-freiburg.de)
+
+  # --rt_low 30.0 \
+  # --rt_high 35.0 \
+  # --mz_low 800.0 \
+  # --mz_high 1000.0 \
 
 Rscript --vanilla ../dimsp.R \
   --mzxml_file "../test-data/mzML/01_sample.mzML, ../test-data/mzML/02_sample.mzML,../test-data/mzML/03_sample.mzML,../test-data/mzML/04_sample.mzML" \
