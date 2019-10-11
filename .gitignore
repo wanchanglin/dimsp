@@ -1,6 +1,6 @@
 ## Folders to be ignored
 doc/
-res/
+# res/
 
 ## R History and session data files
 .RData
