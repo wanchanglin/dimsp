@@ -8,7 +8,7 @@
   https://docs.galaxyproject.org/en/master/dev/schema.html to find the 
   solution
   2.) Beware that 'samp_name' is not input in Galaxy. it takes names of mzxml 
-  file     
+  file
   wl-29-08-2018, Wed: add rtrange, mzrang and hwidth
   wl-01-03-2019, Fri: add mutiple input data format, mzXML and mzML
   wl-20-03-2019, Wed: add more tests
@@ -16,6 +16,7 @@
   Although the contents are the same the file sizes are different. even use 
   the same version of 'WriteXLS'. The planemo always produces a big xlsx
   file. Have to comment out the xlsx file in 'test'.
+  wl-25-08-2020, Tue: remove 'WriteXLS' and use tabular format for sample output
 --> 
 
 <tool id="dimsp" name="dims_processing" version="0.1.0">
@@ -96,7 +97,7 @@
     <param name="indi" type="boolean" truevalue="True" falsevalue="False" 
            checked="True" 
            label="Produce signal and deviation for each individual sample?"
-           help="An Excel XLSX file containing sheets of individual sample's
+           help="An tabular file containing sheets of individual sample's
                  signals and m/z deviations." />
   </inputs>
 
@@ -108,7 +109,7 @@
         label="m/z deviations file on ${on_string}">
       <filter> devi == True </filter>
     </data>
-    <data format="xlsx" name="indi_file" 
+    <data format="tabular" name="indi_file" 
         label="Individual sample's signal and m/z deviation on ${on_string}">
       <filter> indi == True </filter>
     </data>
@@ -116,18 +117,20 @@
 
   <!-- =============================================================== -->
   <tests>
+    <!-- mzML positive -->
     <test>
       <param name="mzxml_file" value="mzML/01_sample.mzML,mzML/02_sample.mzML,mzML/03_sample.mzML,mzML/04_sample.mzML" />
-      <param name="targ_file" value="LipidList_generator/Positive_LipidList.tsv" />
+      <param name="targ_file" value="lipid_list/Positive_LipidList.tsv" />
       <param name="rt_low" value="20.0" />
       <param name="rt_high" value="60.0" />
       <param name="mz_low" value="200.0" />
       <param name="mz_high" value="1200.0" />
-      <param name="devi" value="TRUE" /> 
-      <param name="indi" value="TRUE" /> 
+      <param name="hwidth" value="0.01" />
+      <param name="devi" value="TRUE" />
+      <param name="indi" value="TRUE" />
       <output name="sign_file" file="res/mzml_pos_sign.tsv" />
       <output name="devi_file" file="res/mzml_pos_devi.tsv" />
-      <!-- <output name="indi_file" file="res/mzml_pos_indi.xlsx" compare="sim_size" delta="1000"/> -->
+      <output name="indi_file" file="res/mzml_pos_indi.tsv" />
     </test>
   </tests>
 

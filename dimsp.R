@@ -13,7 +13,7 @@
 #'   supports both mzXML and mzML.
 #' wl-04-03-2019, Mon: add mz file directory option. It is not for Galaxy
 #'   since it is impossible to load data in a specific directiory of Galaxy
-#'   sever. This option is only for direct use of R script, either in 
+#'   sever. This option is only for direct use of R script, either in
 #'   interactive or command line mode. See shell script in './test'
 #' wl-20-03-2019, Wed: change structure of 'test-data' and put results into
 #'   this directory for Galaxy planemo test.
@@ -28,6 +28,7 @@
 #' loads data without peak detection(peak picking, peak finding). Note that
 #' 'xcmsSet' (here not using) performs peak detection via 'findPeaks'. Use
 #' 'ProteoWizards' for peak picking when converting data to mzML.
+#' wl-24-08-2020, Mon: Review. Remove 'WriteXLS'
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -50,8 +51,6 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  library(WriteXLS)
-  #' library(writexl)
   library(xcms)
   library(data.table)
 })
@@ -144,8 +143,8 @@ if (com_f) {
         help = "Return each sample's signal and m/z deviation or not"
       ),
       make_option("--indi_file",
-        type = "character", default = "sam_indi.xlsx",
-        help = "Save individual sample's signal and m/z deviation in Excel"
+        type = "character", default = "samp_indi.tsv",
+        help = "Save individual sample's signal and m/z deviation"
       )
     )
 
@@ -155,25 +154,25 @@ if (com_f) {
   )
   print(opt)
 } else {
-  tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
-  #' tool_dir <- "~/my_galaxy/dimsp/" #' for linux. must be case-sensitive
+  tool_dir <- "~/R_lwc/r_data/cam1/dimsp/"
+  #' tool_dir <- "~/my_galaxy/dimsp/"
+  #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
   opt <- list(
     #' input
 
-    #' mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
-    #'                    paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
-    #'                    sep = ","),
+    #' mzxml_file = paste(paste0(tool_dir, "test-data/mzML")),
 
-    ## mzxml_file = paste(paste0(tool_dir, "test-data/mzML/01_sample.mzML"),
-    ##                    paste0(tool_dir, "test-data/mzML/02_sample.mzML"),
-    ##                    paste0(tool_dir, "test-data/mzML/03_sample.mzML"),
-    ##                    paste0(tool_dir, "test-data/mzML/04_sample.mzML"),
-    ##                    sep = ","
-    ##                    ),
-    
-    mzxml_file = paste(paste0(tool_dir, "test-data/mzXML")),
+    ## mzxml_file = paste(paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML"),
+    ##                    paste0(tool_dir, "test-data/mzXML/030317_mouse_liver_cs16_pos_004.mzXML"),
+    ##                    sep = ","),
 
-    targ_file = paste0(tool_dir, "test-data/LipidList_generator/Positive_LipidList.tsv"),
+    mzxml_file = paste(paste0(tool_dir, "test-data/mzML/01_sample.mzML"),
+                       paste0(tool_dir, "test-data/mzML/02_sample.mzML"),
+                       paste0(tool_dir, "test-data/mzML/03_sample.mzML"),
+                       paste0(tool_dir, "test-data/mzML/04_sample.mzML"),
+                       sep = ","),
+
+    targ_file = paste0(tool_dir, "test-data/lipid_list/Positive_LipidList.tsv"),
     #' samp_name = "mzXML/030317_mouse_liver_cs16_pos_001.mzXML,mzXML/030317_mouse_liver_cs16_pos_002.mzXML",
     samp_name = "",
     rt_low = 20.0,
@@ -182,13 +181,14 @@ if (com_f) {
     mz_high = 1200.0,
     hwidth = 0.01,
     #' Output
-    sign_file = paste0(tool_dir, "test-data/res_dimsp/signals.tsv"),
+    sign_file = paste0(tool_dir, "test-data/res/mzml_pos_sign.tsv"),
     devi = TRUE,
-    devi_file = paste0(tool_dir, "test-data/res_dimsp/deviations.tsv"),
+    devi_file = paste0(tool_dir, "test-data/res/mzml_pos_devi.tsv"),
     indi = TRUE,
-    indi_file = paste0(tool_dir, "test-data/res_dimsp/individuals.xlsx")
+    indi_file = paste0(tool_dir, "test-data/res/mzml_pos_indi.tsv")
   )
 }
+print(opt)
 
 suppressPackageStartupMessages({
   source(paste0(tool_dir, "all_dimsp.R"))
@@ -196,47 +196,51 @@ suppressPackageStartupMessages({
 
 ## ==== Main process ====
 
-#' process multiple input files seperated by comma
+#' ------------------------------------------------------------------------
+#' Prepare data and targets
+
+#' Process multiple input files seperated by comma
 #' wl-04-03-2019, Mon: add file directory option. Note that it is not for
 #' galaxy.
 if (dir.exists(opt$mzxml_file)) {   ## file directory
-  opt$mzxml_file <- list.files(opt$mzxml_file, pattern = "mzml|mzxml", 
-                               ignore.case = T, recursive = F, full.names = TRUE)
+  opt$mzxml_file <- list.files(opt$mzxml_file, pattern = "mzml|mzxml",
+                               ignore.case = T, recursive = F,
+                               full.names = TRUE)
 } else {  ## multiple files
   opt$mzxml_file <- str_vec(opt$mzxml_file)
-} 
-
-targets <- read.table(opt$targ_file, header = T, sep = "\t", stringsAsFactors = F)
-targets <- data.table(targets)
-
-#' ------------------------------------------------------------
-#' temporary debug in interactive mode
-if (T) {
-  res <- lapply(opt$mzxml_file, function(x) { #' x = files[[1]]
-    spec <- suppressMessages(getspectra(
-      filename = x,
-      rt = c(opt$rt_low, opt$rt_high),
-      mz = c(opt$mz_low, opt$mz_high)
-    ))
-    tgts <- peaktable(targets, spec, opt$hwidth)
-    return(tgts)
-  })
-
-  #' handle sample names
-  if (opt$samp_name == "") {
-    opt$samp_name <- opt$mzxml_file
-  } else {
-    opt$samp_name <- str_vec(opt$samp_name)
-  }
-  #' extract only sample names (use greedy match)
-  names(res) <- gsub(".*/|\\..*$", "", opt$samp_name, perl = T)
-
-  #' save(res,file=paste0(tool_dir,"res/res.RData"))
-} else {
-  #' load(paste0(tool_dir,"res/res.RData"))
 }
 
-#' --------------------------------------------------------------------
+targets <- read.table(opt$targ_file, header = T, sep = "\t",
+                      stringsAsFactors = F)
+
+targets <- data.table(targets)
+
+#' ------------------------------------------------------------------------
+#' Process data
+res <- lapply(opt$mzxml_file, function(x) { #' x = files[[1]]
+  spec <- suppressMessages(getspectra(
+    filename = x,
+    rt = c(opt$rt_low, opt$rt_high),
+    mz = c(opt$mz_low, opt$mz_high)
+  ))
+  tgts <- peaktable(targets, spec, opt$hwidth)
+  return(tgts)
+})
+
+#' handle sample names
+if (opt$samp_name == "") {
+  opt$samp_name <- opt$mzxml_file
+} else {
+  opt$samp_name <- str_vec(opt$samp_name)
+}
+#' extract only sample names (use greedy match)
+names(res) <- gsub(".*/|\\..*$", "", opt$samp_name, perl = T)
+
+#' save(res,file=paste0(tool_dir,"res/res.RData"))
+#' load(paste0(tool_dir,"res/res.RData"))
+#' lapply(res, dim)
+
+#' ------------------------------------------------------------------------
 #' Output results
 #' get signals (intensity) and mz deviations
 tmp        <- targets[, c("name", "mz")]
@@ -251,191 +255,17 @@ write.table(signals, file = opt$sign_file, sep = "\t", row.names = F)
 if (opt$devi) {
   write.table(deviations, file = opt$devi_file, sep = "\t", row.names = F)
 }
-#' #' save each sample result
+
+#' save each sample result
+#' wl-25-08-2020, Tue: save as tabular format. 'xlsx' make galaxy test fail.
 if (opt$indi) {
+  #' library(WriteXLS)
+  #' library(writexl)
   #' write_xlsx(res, path = opt$indi_file, col_names = T, format_headers = T)
-  WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
-}
-
-#' cat("\ngoes here\n")
-#' lapply(res, dim)
-
-## ==== DEBUG: Interactive mode ====
-#' wl-01-03-2019, Fri: test mzML file which is not mentioned in 'xcms'
-
-if (F) {
-  source("./all_dimsp.R")
-
-  #' file path of mzML files
-  #' path <- "C:/R_lwc/dims_processing/test-data/"
-  path <- "./test-data/mzML"
-  files <- list.files(path, pattern = "mzML", recursive = F, full.names = TRUE)
-  (files <- files[1:4])
-
-  targets <- read.table("./test-data/LipidList_generator/Positive_LipidList.tsv",
-    header = T, sep = "\t", stringsAsFactors = F
-  )
-  targets <- data.table(targets)
-
-  #' ------------------------------------------------------------
-  if (T) {
-    res <- lapply(files, function(x) {
-      #' x = files[[1]]
-      spec <- getspectra(filename = x, rt = c(20, 60), mz = c(200, 1200))
-      tgts <- peaktable(targets, spec)
-      return(tgts)
-    })
-    #' extract only sample names (use greedy match)
-    names(res) <- gsub(".*/|\\..*$", "", files, perl = T)
-    save(res, file = "./res/tmp_res.RData")
-  } else {
-    load("tmp_res.RData")
-  }
-
-  lapply(res, dim)
-
-  #' --------------------------------------------------------------------
-  #' save single result
-  WriteXLS(res,
-    ExcelFileName = "./res/tmp_pos.xlsx", row.names = F,
-    FreezeRow = 1
-  )
-  if (F) { #' or use this
-    lapply(names(res), function(x) {
-      write.csv(res[[x]], file = paste0("./res/", x, ".csv"), row.names = F)
-    })
-  }
-
-  #' --------------------------------------------------------------------
-  #' get signals (intensity) and mz deciations
-  tmp <- targets[, c("name", "mz")]
-  signals <- sapply(res, function(x) return(x[, "signal"]))
-  deviations <- sapply(res, function(x) return(x[, "mz_deviation"]))
-  signals <- cbind(tmp, signals)
-  deviations <- cbind(tmp, deviations)
-  #' save results
-  write.csv(signals, file = "./res/tmp_sig.csv", row.names = F)
-  write.csv(deviations, file = "./res/tmp_dev.csv", row.names = F)
-
-  #' results <- signals_deviations()
-  #' gc() # helps memory allocation errors on low memory systems
-}
-
-## ==== DEBUG: Use xcms to load data ====
-if (F) { 
-  xr <- xcmsRaw(files[1])
-  xr
-
-  #' wl-19-07-2019, Fri: test
-  spec <- getSpec(xr, rtrange = c(20, 60), mzrange = c(200, 1200))
-  peak <- findPeaks(xr)    #' why only 10 peaks returned?
-
-  #' ----------------------------------------
-  #' look at the structure of the object
-  slotNames(xr)
-  #' names(attributes(xr))
-  #' str(xr)
-
-  #' scan time
-  xr@scantime
-  range(xr@scantime)
-  summary(xr@scantime)
-
-  xr@scanindex
-  head(xr@scanindex)
-
-  #' m/z range
-  xr@mzrange
-
-  names(xr@env) #' profile, mz, intensity
-  xr@env$mz[425:430]
-
-  #' ----------------------------------------
-  mz.scan1 <- xr@env$mz[(1 + xr@scanindex[1]):xr@scanindex[2]]
-  intensity.scan1 <- xr@env$intensity[(1 + xr@scanindex[1]):xr@scanindex[2]]
-  plot(mz.scan1, intensity.scan1,
-    type = "h",
-    main = paste("Scan 1 of file", basename(files[1]), sep = "")
-  )
-
-  #' the easier way
-  scan1 <- getScan(xr, 1)
-  head(scan1)
-  plotScan(xr, 1)
-
-  #' ----------------------------------------
-  spec <- getSpec(xr, rtrange = c(20, 60), mzrange = c(200, 1200))
-  spec_1 <- getSpec(xr, t = c(20, 60), m = c(200, 1200)) #' rtrange and mzrange
-  spec_2 <- getSpec(xr, m = c(200, 1200)) #' mzrange
-  spec_3 <- getSpec(xr, s = c(98, 297), m = c(200, 1200)) #' scanrange and mzrange
-  spec_4 <- getSpec(xr)
-
-  #' Note: The results of 'spec' ~ 'spec_4' are confused:
-  #'  - is rt 'scantime' in this case?
-  #'  - Source code of `getSpec` does not use 'rtrange'.
-  #'  - strange: results of 'spec' and 'spec_1' are not the same.
-
-  dim(spec) #' [1] 2096693       2
-  length(unique(spec[, 1])) #' [1] 2096693
-
-  spec[, "mz"] <- round(spec[, "mz"], digits = 4)
-  spec <- as.data.table(spec)
-  spec <- spec[, mean(intensity), by = mz]
-  spec <- na.omit(spec)
-}
-## ==== DEBUG: Use xcms to check ranges of time and m/z ====
-if (F) { 
-  tmp <- sapply(files, function(x){ #' x <- files[1]              
-    obj <- xcmsRaw(x) 
-    #' slotNames(obj)
-    #' obj     
-    
-    #' wl-15-07-2019, Mon: from 'xcmsRaw' show method 
-
-    #' time range
-    time_range  <- round(range(obj@scantime),1)
-    #' summary(obj@scantime)
-
-    #' mass range
-    mass_range <- round(range(obj@env$mz), 4)
-
-   list(time_range=time_range, mass_rang=mass_range)
+  #' WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
+  tmp <- lapply(names(res), function(x){
+    res <- cbind(sample = x, res[[x]])
   })
-  tmp <- t(tmp) 
-
-  #' wl-15-07-2019, Mon: should properly use lapply instead of sapply and
-  #' get scan time and m/z range individually. Here is dirt and quick.
-
+  tmp <- do.call("rbind", tmp)
+  write.table(tmp, file = opt$indi_file, sep = "\t", row.name = FALSE)
 }
-
-## ==== DEBUG: Use MSnbase to load data ====
-if (F) { 
-  raw_data <- readMSData(files, mode = "onDisk")
-  raw_data
-  slotNames(raw_data)
-
-  #' --------------------
-  rt <- rtime(raw_data)
-  class(rt) #' numeric
-  length(rt) #' 2673 = 9 * 297
-
-  #' --------------------
-  mzs <- mz(raw_data)
-  #' Split the list by file
-  mzs_by_file <- split(mzs, f = fromFile(raw_data))
-  length(mzs_by_file)
-  length(mzs_by_file[[1]])
-  length(mzs_by_file[[1]][[1]])
-  summary(mzs_by_file[[1]][[1]])
-
-  #' --------------------
-  inten <- intensity(raw_data)
-  inten_by_file <- split(inten, f = fromFile(raw_data))
-  length(inten_by_file) #' 9
-  length(inten_by_file[[1]]) #' 297
-  length(inten_by_file[[1]][[1]]) #' 13004
-
-  #' wl-15-07-2019, Mon: it is inconvenient to check rnages of time and m/z.
-  #' use xcms instead.
-}
-
