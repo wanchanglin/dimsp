@@ -25,6 +25,7 @@
 #' wl-28-03-2019, Thu: make sure mv filtering must be performed once on
 #'  **sample**
 #' wl-01-04-2019, Mon: debug rsd threshold again.
+#' wl-25-08-2020, Tue: review. No changes.
 
 ## ==== General settings ====
 rm(list = ls(all = T))
@@ -47,7 +48,10 @@ loc <- Sys.setlocale("LC_MESSAGES", "en_US.UTF-8")
 
 suppressPackageStartupMessages({
   library(optparse)
-  library(WriteXLS)
+  library(reshape)
+  library(lattice)
+  library(impute)
+  library(pcaMethods)
 })
 
 #' wl-28-08-2018, Tue: Convert a string separated by comma into character vector
@@ -191,8 +195,9 @@ if (com_f) {
     args = commandArgs(trailingOnly = TRUE)
   )
 } else {
+  tool_dir <- "~/R_lwc/r_data/cam1/dimsp/" #' for linux. Must be case-sensitive
+  #' tool_dir <- "~/my_galaxy/dimsp/" #' for linux. Must be case-sensitive
   #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
-  tool_dir <- "~/my_galaxy/dimsp/" #' for linux. Must be case-sensitive
   opt <- list(
     #' Input
     peak_file = paste0(tool_dir, "test-data/pos_peak.tsv"),
@@ -207,8 +212,8 @@ if (com_f) {
     #' QC filtering
     qc = TRUE,
     #' wl-01-04-2019, Mon: It is critical to choose rsd threshold. The
-    #' distribution of rsd could be a guidian. 
-    qc_rsd_thres = 60.0, 
+    #' distribution of rsd could be a guardian.
+    qc_rsd_thres = 60.0,
     qc_mv_filter = TRUE,
     qc_mv_qc_sam = TRUE,
     qc_mv_thres = 0.30,
@@ -231,8 +236,8 @@ if (com_f) {
     mv_impute = "mean",
 
     #' output
-    pdf_file = paste0(tool_dir, "test-data/res_dimsp_filter/hist_box_deb.pdf"),
-    filter_file = paste0(tool_dir, "test-data/res_dimsp_filter/peak_filter_deb.tsv")
+    pdf_file = paste0(tool_dir, "test-data/res/hist_box.pdf"),
+    filter_file = paste0(tool_dir, "test-data/res/peak_filter.tsv")
   )
 }
 print(opt)

@@ -7,7 +7,7 @@
 #   'test-data' for Galaxy planemo test comparison. 
 Rscript --vanilla ../dimsp.R \
   --mzxml_file  "../test-data/mzXML/030317_mouse_liver_cs16_pos_001.mzXML, ../test-data/mzXML/030317_mouse_liver_cs16_pos_002.mzXML" \
-  --targ_file  "../test-data/LipidList_generator/Positive_LipidList.tsv" \
+  --targ_file  "../test-data/lipid_list/Positive_LipidList.tsv" \
   --indi TRUE \
   --devi TRUE \
   --sign_file "../test-data/res/mzxml_pos_sign.tsv" \

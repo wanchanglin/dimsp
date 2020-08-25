@@ -2,13 +2,6 @@
 #' wl-01-03-2019, Fri: reformat with 'styler' and change comment string to
 #'   "#'" for 'lintr'.
 
-suppressPackageStartupMessages({
-  library(reshape)
-  library(lattice)
-  library(impute)
-  library(pcaMethods)
-})
-
 #' =========================================================================
 #' wl-02-06-2011: Relative standard deviation of matrix/data frame in
 #' column wise

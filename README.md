@@ -10,11 +10,6 @@ For details how to get annotation and peak table, see
 
 - Install [Galaxy](https://github.com/galaxyproject/galaxy) under Linux.
 
-- Install [conda](https://docs.conda.io/en/latest/miniconda.html) under
-  Linux. `conda` is used to install `requirements` of this tool, i.e. R
-  packages used: `optparse`, `WriteXLS`, `xcms`, `data.table`,
-  `reshape`, `lattice`, `impute` and `pcaMethods`. 
-
 - Use `git` to clone this tool
 
   ```bash

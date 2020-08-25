@@ -19,12 +19,12 @@ wl-01-04-2019, Mon: add more test and all pass.
   <!-- =============================================================== -->
   <command detect_errors="exit_code">
     <![CDATA[
-    
+
       Rscript ${__tool_directory__}/dimsp_filter.R
         --peak_file '$peak_file'
 
         ## input group information directly or load a file?
-        --grp_file_sel '$grp.grp_file_sel' 
+        --grp_file_sel '$grp.grp_file_sel'
         #if $grp.grp_file_sel=='yes':
           --grp_file '$grp.grp_file'
         #else
@@ -38,7 +38,7 @@ wl-01-04-2019, Mon: add more test and all pass.
           --qc_mv_qc_sam '$qc_filter.qc_set.qc_mv_qc_sam'
           --qc_mv_thres  '$qc_filter.qc_set.qc_mv_thres'
         #end if
-        
+
         ## blank filtering
         #if $bl_filter.bl:
           --bl_method    '$bl_filter.bl_set.bl_method'
@@ -48,7 +48,7 @@ wl-01-04-2019, Mon: add more test and all pass.
         #end if
 
         ## MV filtering on samples
-        #if $mv_filter.mv: 
+        #if $mv_filter.mv:
           --mv_thres '$mv_filter.mv_set.mv_thres'
         #end if
 
@@ -90,7 +90,7 @@ wl-01-04-2019, Mon: add more test and all pass.
                or 4) sample, qc, blank. And number of each content must be no
                less than 2.  " />
              <!-- wl-30-11-2018, Fri: cannot use format="tabular". It does
-                  not treat one column data file as tabular format.  -->   
+                  not treat one column data file as tabular format.  -->
       </when>
       <when value="no">
         <param name="groups" type="text" value=""
@@ -99,7 +99,7 @@ wl-01-04-2019, Mon: add more test and all pass.
                'qc','blank'. The length of contents must be the same as the 
                number of replicates. Any other names are not allowed." />
       </when>
-      
+
     </conditional>
 
     <!-- =============================================================== -->
@@ -398,19 +398,19 @@ providing the group information:
   example:
 
 
-  +--------+   
-  | sample |        
-  +--------+        
-  | sample |        
-  +--------+        
-  | qc     |        
-  +--------+        
-  | qc     |        
-  +--------+        
-  | blank  |        
-  +--------+        
-  | blank  |        
-  +--------+        
+  +--------+
+  | sample |
+  +--------+
+  | sample |
+  +--------+
+  | qc     |
+  +--------+
+  | qc     |
+  +--------+
+  | blank  |
+  +--------+
+  | blank  |
+  +--------+
 
     |
 
