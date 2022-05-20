@@ -12,7 +12,7 @@
 #'   with R package 'styler'. Remove input file extension checking so it
 #'   supports both mzXML and mzML.
 #' wl-04-03-2019, Mon: add mz file directory option. It is not for Galaxy
-#'   since it is impossible to load data in a specific directiory of Galaxy
+#'   since it is impossible to load data in a specific directory of Galaxy
 #'   sever. This option is only for direct use of R script, either in
 #'   interactive or command line mode. See shell script in './test'
 #' wl-20-03-2019, Wed: change structure of 'test-data' and put results into
@@ -55,7 +55,7 @@ suppressPackageStartupMessages({
   library(data.table)
 })
 
-#' wl-28-08-2018, Tue: Convert a string seperated by comma into character vector
+#' wl-28-08-2018, Tue: Convert a string separated by comma into character vector
 str_vec <- function(x) {
   x <- unlist(strsplit(x, ","))
   x <- gsub("^[ \t]+|[ \t]+$", "", x) #' trim white spaces
@@ -94,7 +94,7 @@ if (com_f) {
       #' input
       make_option("--mzxml_file",
         type = "character",
-        help = "mzXML/ mzML file directory or full file list seperated by comma"
+        help = "mzXML/ mzML file directory or full file list separated by comma"
       ),
       make_option("--targ_file",
         type = "character",
@@ -154,8 +154,7 @@ if (com_f) {
   )
   print(opt)
 } else {
-  tool_dir <- "~/R_lwc/r_data/cam1/dimsp/"
-  #' tool_dir <- "~/my_galaxy/dimsp/"
+  tool_dir <- "~/my_galaxy/dimsp/"
   #' tool_dir <- "C:/R_lwc/dimsp/"         #' for windows
   opt <- list(
     #' input
@@ -199,7 +198,7 @@ suppressPackageStartupMessages({
 #' ------------------------------------------------------------------------
 #' Prepare data and targets
 
-#' Process multiple input files seperated by comma
+#' Process multiple input files separated by comma
 #' wl-04-03-2019, Mon: add file directory option. Note that it is not for
 #' galaxy.
 if (dir.exists(opt$mzxml_file)) {   ## file directory
@@ -259,7 +258,6 @@ if (opt$devi) {
 #' save each sample result
 #' wl-25-08-2020, Tue: save as tabular format. 'xlsx' make galaxy test fail.
 if (opt$indi) {
-  #' library(WriteXLS)
   #' library(writexl)
   #' write_xlsx(res, path = opt$indi_file, col_names = T, format_headers = T)
   #' WriteXLS(res, ExcelFileName = opt$indi_file, row.names = T, FreezeRow = 1)
